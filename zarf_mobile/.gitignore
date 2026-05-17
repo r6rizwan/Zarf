@@ -1,0 +1,17 @@
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+*.g.dart
+*.freezed.dart
+google-services.json
+GoogleService-Info.plist
+android/local.properties
+android/.gradle/
+ios/Pods/
+ios/.symlinks/
+coverage/
+.env
+.idea/
+*.iml
+.DS_Store
