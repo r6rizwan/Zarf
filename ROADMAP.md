@@ -115,26 +115,26 @@ Full-stack corporate expense management app targeting UAE/GCC market.
 > Goal: Demoable, documented, recruiter-ready.
 
 ### Backend
-- [ ] Seed script — 1 admin, 2 managers, 5 employees, 1 company (vatRate: 5),
+- [x] Seed script — 1 admin, 2 managers, 5 employees, 1 company (vatRate: 5),
                     30 days of randomized expenses across categories + statuses
-- [ ] Bruno/Postman collection — all /api/v1/ routes with example request bodies
+- [x] Bruno/Postman collection — all /api/v1/ routes with example request bodies
 - [ ] Deploy to Railway or Render (free tier)
 
 ### Flutter
-- [ ] FCM push notifications — on expense approved/rejected
-- [ ] App icon + splash screen
-- [ ] Build release APK — attach to GitHub releases
+- [x] FCM push notifications — on expense approved/rejected
+- [~] App icon + splash screen
+- [~] Build release APK — attach to GitHub releases
 
 ### React
 - [ ] Deploy to Vercel (free tier)
 - [ ] Update CORS CLIENT_URL to Vercel domain
 
 ### Repo
-- [ ] README.md — project overview, UAE/GCC fintech context, setup instructions
+- [x] README.md — project overview, UAE/GCC fintech context, setup instructions
                    for all 3 parts, .env.example reference, APK download link,
                    RTL-ready note, VAT configurable note, live demo links
-- [ ] ASCII architecture diagram in README
-- [ ] All three .gitignore files verified — .env and secrets never committed
+- [x] ASCII architecture diagram in README
+- [x] All three .gitignore files verified — .env and secrets never committed
 
 ---
 

@@ -1,5 +1,6 @@
 import '../models/user.dart';
 import '../services/api_service.dart';
+import '../services/notification_service.dart';
 
 class AuthRepo {
   final api = ApiService.instance;
@@ -17,6 +18,9 @@ class AuthRepo {
 
     final user = User.fromJson(res.data['user']);
     await api.saveCurrentUser(user);
+
+    await NotificationService.instance.syncFcmToken();
+
     return user;
   }
 

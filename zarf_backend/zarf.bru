@@ -1,0 +1,150 @@
+meta {
+  name: Zarf API Collection
+  type: http
+}
+
+auth {
+  mode: bearer
+  bearer {{accessToken}}
+}
+
+# Auth - Register
+post {
+  url: {{baseUrl}}/auth/register
+  body: json
+  auth: none
+}
+body:json {
+  {
+    "name": "Demo User",
+    "email": "demo@zarf.demo",
+    "password": "Demo@1234",
+    "role": "employee",
+    "companyId": "{{companyId}}"
+  }
+}
+
+# Auth - Login
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+body:json {
+  {
+    "email": "admin@zarf.demo",
+    "password": "Admin@1234"
+  }
+}
+
+# Auth - Refresh
+post {
+  url: {{baseUrl}}/auth/refresh
+  body: json
+  auth: none
+}
+body:json {
+  {
+    "refreshToken": "{{refreshToken}}"
+  }
+}
+
+# Expenses - List (pagination)
+get {
+  url: {{baseUrl}}/expenses?page=1&limit=20&status=pending
+}
+
+# Expenses - Create
+post {
+  url: {{baseUrl}}/expenses
+  body: json
+}
+body:json {
+  {
+    "amount": 250,
+    "currency": "AED",
+    "category": "Meals",
+    "notes": "Client lunch",
+    "vatApplicable": true,
+    "vatAmount": 12.5,
+    "paymentMethod": "Card",
+    "date": "2026-05-17T10:00:00.000Z"
+  }
+}
+
+# Expenses - Get by id
+get {
+  url: {{baseUrl}}/expenses/{{expenseId}}
+}
+
+# Expenses - Update status
+patch {
+  url: {{baseUrl}}/expenses/{{expenseId}}/status
+  body: json
+}
+body:json {
+  {
+    "status": "approved",
+    "reviewNote": "Looks good"
+  }
+}
+
+# Expenses - Delete
+delete {
+  url: {{baseUrl}}/expenses/{{expenseId}}
+}
+
+# Expenses - Parse receipt
+post {
+  url: {{baseUrl}}/expenses/parse-receipt
+  body: multipartForm
+}
+body:multipart-form {
+  receipt: @/absolute/path/to/receipt.jpg
+}
+
+# Users - Save FCM token
+patch {
+  url: {{baseUrl}}/users/fcm-token
+  body: json
+}
+body:json {
+  {
+    "fcmToken": "demo-token"
+  }
+}
+
+# Analytics - Summary
+get {
+  url: {{baseUrl}}/analytics/summary?month=5&year=2026
+}
+
+# Analytics - By category
+get {
+  url: {{baseUrl}}/analytics/by-category?month=5&year=2026
+}
+
+# Analytics - By employee
+get {
+  url: {{baseUrl}}/analytics/by-employee?month=5&year=2026
+}
+
+# Analytics - VAT report
+get {
+  url: {{baseUrl}}/analytics/vat-report?month=5&year=2026
+}
+
+# Company - Patch settings
+patch {
+  url: {{baseUrl}}/company/{{companyId}}
+  body: json
+}
+body:json {
+  {
+    "name": "Zarf Demo Co.",
+    "vatRegistered": true,
+    "vatRate": 5,
+    "vatNumber": "TRN-DEMO-001",
+    "baseCurrency": "AED"
+  }
+}

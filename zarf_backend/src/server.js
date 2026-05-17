@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.routes.js';
 import expenseRoutes from './routes/expense.routes.js';
 import companyRoutes from './routes/company.routes.js';
 import analyticsRoutes from './routes/analytics.routes.js';
+import userRoutes from './routes/user.routes.js';
 import { generalLimiter } from './middleware/rateLimiter.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
@@ -27,6 +28,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/expenses', expenseRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/company', companyRoutes);
+app.use('/api/v1/users', userRoutes);
 
 app.use(errorHandler);
 

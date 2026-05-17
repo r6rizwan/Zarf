@@ -2,9 +2,11 @@ import fs from 'fs/promises';
 import { v2 as cloudinary } from 'cloudinary';
 import Company from '../models/Company.js';
 import Expense from '../models/Expense.js';
+import User from '../models/User.js';
 import { cleanupTempFile } from '../middleware/uploadMiddleware.js';
 import { ForbiddenError, NotFoundError, ValidationError } from '../middleware/errorHandler.js';
 import { convert, getRates } from '../services/currencyService.js';
+import { sendNotification } from '../services/fcmService.js';
 import { parseReceipt } from '../services/groqService.js';
 
 cloudinary.config({ secure: true });
@@ -145,6 +147,22 @@ export const updateExpenseStatus = async (req, res, next) => {
     expense.reviewNote = reviewNote;
     expense.reviewedBy = req.user.id;
     await expense.save();
+
+    const owner = await User.findById(expense.userId).select('fcmToken');
+    if (status === 'approved') {
+      await sendNotification(
+        owner?.fcmToken,
+        'Expense Approved',
+        'Your expense has been approved'
+      );
+    }
+    if (status === 'rejected') {
+      await sendNotification(
+        owner?.fcmToken,
+        'Expense Rejected',
+        'Your expense was rejected'
+      );
+    }
 
     res.json({ success: true, data: expense });
   } catch (err) {
