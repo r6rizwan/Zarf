@@ -42,20 +42,20 @@ const createDemoUsers = async (companyId) => {
 
 const createExpenses = async (companyId) => {
   const already = await Expense.countDocuments({ companyId });
-  if (already >= 50) return;
+  if (already >= 120) return;
 
   const managers = await User.find({ companyId, role: 'manager' }).select('_id');
   const employees = await User.find({ companyId, role: 'employee' }).select('_id');
 
   const records = [];
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 120; i++) {
     const amount = rand(50, 5000);
     const status = pick(statuses);
-    const daysAgo = rand(0, 29);
+    const daysAgo = rand(0, 179);
     const date = new Date();
     date.setDate(date.getDate() - daysAgo);
 
-    const vatApplicable = i < 10;
+    const vatApplicable = i < 30;
     const vatAmount = vatApplicable ? Number((amount * 0.05).toFixed(2)) : 0;
 
     records.push({
@@ -95,7 +95,7 @@ const seed = async () => {
 
   const usersCount = await User.countDocuments({ companyId: company._id });
   const expensesCount = await Expense.countDocuments({ companyId: company._id });
-  if (usersCount >= 8 && expensesCount >= 50) {
+  if (usersCount >= 8 && expensesCount >= 120) {
     console.log('already seeded');
     await mongoose.connection.close();
     return;

@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 
-export default function ApproveRejectModal({ open, onClose, onConfirm, action }) {
+export default function ApproveRejectModal({ open, onClose, onConfirm, action, loading }) {
   const [note, setNote] = useState('');
 
   if (!open) return null;
@@ -22,26 +23,33 @@ export default function ApproveRejectModal({ open, onClose, onConfirm, action })
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="Add a comment (optional)"
+          disabled={loading}
         />
         <div className="flex justify-end gap-3 mt-4">
           <button
-            className="px-4 py-2 text-sm font-medium border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             onClick={onClose}
+            disabled={loading}
           >
             Cancel
           </button>
           <button
-            className={`px-4 py-2 text-sm font-medium rounded-lg text-white transition-colors ${
+            className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
               isApprove
                 ? 'bg-emerald-600 hover:bg-emerald-700'
                 : 'bg-rose-600 hover:bg-rose-700'
             }`}
+            disabled={loading}
             onClick={() => {
               onConfirm(note);
               setNote('');
             }}
           >
-            {isApprove ? 'Approve' : 'Reject'}
+            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+            {loading
+              ? (isApprove ? 'Approving…' : 'Rejecting…')
+              : (isApprove ? 'Approve' : 'Reject')
+            }
           </button>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axiosClient from '../api/axiosClient';
-import { Save } from 'lucide-react';
+import { Save, Loader2 } from 'lucide-react';
 
 export default function SettingsPage() {
   const qc = useQueryClient();
@@ -116,11 +116,12 @@ export default function SettingsPage() {
 
         {/* Save */}
         <button
-          className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md px-5 py-2.5 text-sm transition-colors"
+          className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md px-5 py-2.5 text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           onClick={() => saveMutation.mutate()}
+          disabled={saveMutation.isPending}
         >
-          <Save className="w-4 h-4" />
-          Save Changes
+          {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          {saveMutation.isPending ? 'Saving…' : 'Save Changes'}
         </button>
       </div>
     </div>

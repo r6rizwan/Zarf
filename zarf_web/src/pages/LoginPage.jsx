@@ -8,6 +8,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const setAuth = useAuthStore((s) => s.setAuth);
@@ -15,6 +16,7 @@ export default function LoginPage() {
   const submit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     try {
       const res = await axiosClient.post('/auth/login', { email, password });
       const { user, accessToken, refreshToken } = res.data;
@@ -28,6 +30,8 @@ export default function LoginPage() {
       navigate('/dashboard');
     } catch (err) {
       setError(err?.response?.data?.message || 'Login failed');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -96,10 +100,12 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className="w-full bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md py-2.5 text-sm transition-colors"
+              disabled={loading}
+              className="w-full bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md py-2.5 text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               style={{ height: '44px' }}
             >
-              Sign in
+              {loading && <span className="btn-spinner" />}
+              {loading ? 'Signing in…' : 'Sign in'}
             </button>
           </form>
 

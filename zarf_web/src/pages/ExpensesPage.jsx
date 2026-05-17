@@ -74,6 +74,7 @@ export default function ExpensesPage() {
       <ApproveRejectModal
         open={modal.open}
         action={modal.action}
+        loading={mutation.isPending}
         onClose={() => setModal({ open: false, expense: null, action: null })}
         onConfirm={(note) => mutation.mutate({ id: modal.expense._id || modal.expense.id, status: modal.action, reviewNote: note })}
       />

@@ -15,6 +15,7 @@ const cardConfig = {
     iconColor: 'text-amber-600',
     borderColor: 'border-amber-500',
     isCurrency: false,
+    subtitle: 'requests',
   },
   'Approved Total': {
     icon: CheckCircle,
@@ -46,6 +47,7 @@ export default function StatCard({ label, value }) {
         </div>
       </div>
       <p className="text-2xl font-bold text-slate-800">{displayValue}</p>
+      {config.subtitle && <p className="text-xs text-slate-400 mt-0.5">{config.subtitle}</p>}
     </div>
   );
 }
