@@ -13,7 +13,9 @@ const requiredKeys = [
   'GROQ_API_KEY',
   'CLOUDINARY_URL',
   'CURRENCY_API_KEY',
-  'FCM_SERVER_KEY'
+  'FIREBASE_PROJECT_ID',
+  'FIREBASE_CLIENT_EMAIL',
+  'FIREBASE_PRIVATE_KEY'
 ];
 
 for (const key of requiredKeys) {
@@ -33,7 +35,9 @@ const env = {
   GROQ_API_KEY: process.env.GROQ_API_KEY,
   CLOUDINARY_URL: process.env.CLOUDINARY_URL,
   CURRENCY_API_KEY: process.env.CURRENCY_API_KEY,
-  FCM_SERVER_KEY: process.env.FCM_SERVER_KEY,
+  FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID,
+  FIREBASE_CLIENT_EMAIL: process.env.FIREBASE_CLIENT_EMAIL,
+  FIREBASE_PRIVATE_KEY: process.env.FIREBASE_PRIVATE_KEY,
   NODE_ENV: process.env.NODE_ENV || 'development'
 };
 

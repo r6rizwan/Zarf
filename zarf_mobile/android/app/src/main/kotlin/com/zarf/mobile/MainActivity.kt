@@ -1,4 +1,4 @@
-package com.example.zarf_mobile
+package com.zarf.mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -59,12 +59,23 @@ npm install
 npm run dev
 ```
 
+Required backend env keys:
+- `PORT`, `MONGO_URI`
+- `JWT_SECRET`, `JWT_REFRESH_SECRET`, `JWT_EXPIRES_IN`, `JWT_REFRESH_EXPIRES_IN`
+- `CLIENT_URL`
+- `GROQ_API_KEY`, `CLOUDINARY_URL`, `CURRENCY_API_KEY`
+- `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`
+
 ### Flutter
 ```bash
 cd zarf_mobile
 flutter pub get
 flutter run
 ```
+
+Firebase (Android):
+- Package name is `com.zarf.mobile`
+- Place Firebase config at `zarf_mobile/android/app/google-services.json`
 
 ### React
 ```bash
@@ -74,6 +85,9 @@ npm install
 npm run dev
 ```
 
+React env:
+- `VITE_API_URL=http://localhost:3000/api/v1` (or deployed backend URL)
+
 ## Seed Data
 ```bash
 cd zarf_backend
@@ -82,10 +96,12 @@ node src/scripts/seed.js
 ```
 
 ## Demo
+- Web App: [Live Dashboard](https://zarf-cyan.vercel.app)
+- API Backend: [Render API](https://zarf-backend.onrender.com)
 - APK: [GitHub Releases link](https://github.com/r6rizwan/Zarf/releases)
-- Web: [Vercel link](https://vercel.com)
 
 ## Notes
 - VAT rate is company-configurable — not hardcoded anywhere
 - All Flutter layouts use DirectionalityAware alignment
 - Arabic RTL localization is in the roadmap
+- Mobile expense lists auto-refresh (polling + app resume + return from detail)

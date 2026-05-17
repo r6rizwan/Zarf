@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -11,10 +13,12 @@ class MyExpensesScreen extends StatefulWidget {
   State<MyExpensesScreen> createState() => _MyExpensesScreenState();
 }
 
-class _MyExpensesScreenState extends State<MyExpensesScreen> {
+class _MyExpensesScreenState extends State<MyExpensesScreen>
+    with WidgetsBindingObserver {
   final _repo = ExpenseRepo();
   final _items = <Expense>[];
   final _scroll = ScrollController();
+  Timer? _pollTimer;
   int _page = 1;
   int _totalPages = 1;
   bool _loading = false;
@@ -23,15 +27,20 @@ class _MyExpensesScreenState extends State<MyExpensesScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _load(reset: true);
     _scroll.addListener(() {
       if (_scroll.position.pixels >= _scroll.position.maxScrollExtent - 100 && !_loading && _page < _totalPages) {
         _load();
       }
     });
+    _pollTimer = Timer.periodic(const Duration(seconds: 12), (_) {
+      _load(reset: true);
+    });
   }
 
   Future<void> _load({bool reset = false}) async {
+    if (_loading) return;
     setState(() => _loading = true);
     final nextPage = reset ? 1 : _page + 1;
     final res = await _repo.getExpenses(status: _status, page: nextPage, limit: 20);
@@ -42,6 +51,21 @@ class _MyExpensesScreenState extends State<MyExpensesScreen> {
       _items.addAll((res['data'] as List<Expense>));
       _loading = false;
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _load(reset: true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _pollTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    _scroll.dispose();
+    super.dispose();
   }
 
   @override
@@ -82,7 +106,10 @@ class _MyExpensesScreenState extends State<MyExpensesScreen> {
                   return ListTile(
                     title: Text('${expense.category} - ${expense.amount} ${expense.currency}', textAlign: TextAlign.start),
                     subtitle: Text(expense.status, textAlign: TextAlign.start),
-                    onTap: () => context.push('/expense/${expense.id}'),
+                    onTap: () async {
+                      await context.push('/expense/${expense.id}');
+                      _load(reset: true);
+                    },
                   );
                 },
               ),

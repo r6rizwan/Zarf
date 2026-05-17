@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -11,19 +13,40 @@ class ApprovalQueueScreen extends StatefulWidget {
   State<ApprovalQueueScreen> createState() => _ApprovalQueueScreenState();
 }
 
-class _ApprovalQueueScreenState extends State<ApprovalQueueScreen> {
+class _ApprovalQueueScreenState extends State<ApprovalQueueScreen>
+    with WidgetsBindingObserver {
   final _repo = ExpenseRepo();
+  Timer? _pollTimer;
   List<Expense> _items = [];
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _load();
+    _pollTimer = Timer.periodic(const Duration(seconds: 12), (_) {
+      _load();
+    });
   }
 
   Future<void> _load() async {
     final res = await _repo.getExpenses(status: 'pending', page: 1, limit: 20);
+    if (!mounted) return;
     setState(() => _items = (res['data'] as List<Expense>));
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _load();
+    }
+  }
+
+  @override
+  void dispose() {
+    _pollTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -41,7 +64,10 @@ class _ApprovalQueueScreenState extends State<ApprovalQueueScreen> {
             subtitle: Text(
                 '${e.category} • ${e.date.toIso8601String().split('T').first}',
                 textAlign: TextAlign.start),
-            onTap: () => context.push('/expense/${e.id}'),
+            onTap: () async {
+              await context.push('/expense/${e.id}');
+              _load();
+            },
           );
         },
       ),
