@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import { useAuthStore } from '../store/authStore';
+import { Wallet } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -31,15 +32,82 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <form className="bg-white border rounded p-6 w-full max-w-sm" onSubmit={submit}>
-        <h1 className="text-xl font-semibold">Zarf Login</h1>
-        {location.state?.message && <p className="text-amber-700 text-sm mt-2">{location.state.message}</p>}
-        <input className="w-full border rounded p-2 mt-4" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <input className="w-full border rounded p-2 mt-3" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        {error && <p className="text-red-600 text-sm mt-3">{error}</p>}
-        <button className="w-full mt-4 bg-slate-900 text-white rounded py-2">Login</button>
-      </form>
+    <div className="min-h-screen flex">
+      {/* Left branding panel — hidden on mobile */}
+      <div className="hidden lg:flex lg:w-1/2 items-center justify-center" style={{ backgroundColor: '#0f172a' }}>
+        <div className="text-center px-12">
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="w-14 h-14 rounded-xl bg-teal-600 flex items-center justify-center">
+              <Wallet className="w-7 h-7 text-white" />
+            </div>
+            <h1 className="text-5xl font-bold text-white tracking-tight">Zarf</h1>
+          </div>
+          <p className="text-slate-400 text-lg">Expense management built for the GCC</p>
+        </div>
+      </div>
+
+      {/* Right login panel */}
+      <div className="flex-1 flex items-center justify-center bg-white px-6">
+        <div className="w-full max-w-sm">
+          {/* Mobile-only logo */}
+          <div className="flex items-center gap-2 mb-8 lg:hidden">
+            <div className="w-10 h-10 rounded-lg bg-teal-600 flex items-center justify-center">
+              <Wallet className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-2xl font-bold text-slate-800">Zarf</span>
+          </div>
+
+          <h2 className="text-2xl font-bold text-slate-800 mb-1">Welcome back</h2>
+          <p className="text-slate-500 text-sm mb-8">Sign in to your dashboard</p>
+
+          {location.state?.message && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-4">
+              <p className="text-amber-700 text-sm">{location.state.message}</p>
+            </div>
+          )}
+
+          <form onSubmit={submit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+              <input
+                className="w-full border border-slate-300 rounded-md px-3.5 py-2.5 text-sm placeholder-slate-400 transition-colors"
+                placeholder="you@company.com"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
+              <input
+                className="w-full border border-slate-300 rounded-md px-3.5 py-2.5 text-sm placeholder-slate-400 transition-colors"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+                <p className="text-red-600 text-sm">{error}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md py-2.5 text-sm transition-colors"
+              style={{ height: '44px' }}
+            >
+              Sign in
+            </button>
+          </form>
+
+          <p className="text-center text-xs text-slate-400 mt-12">
+            Powered by Groq AI
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

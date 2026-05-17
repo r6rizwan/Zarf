@@ -12,6 +12,7 @@
     "@tanstack/react-query": "^5.59.0",
     "axios": "^1.7.7",
     "date-fns": "^4.1.0",
+    "lucide-react": "^1.16.0",
     "papaparse": "^5.4.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

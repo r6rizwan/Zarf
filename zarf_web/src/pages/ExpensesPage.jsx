@@ -5,6 +5,7 @@ import FilterBar from '../components/shared/FilterBar';
 import ExpenseTable from '../components/expenses/ExpenseTable';
 import ApproveRejectModal from '../components/expenses/ApproveRejectModal';
 import ExportCSVButton from '../components/expenses/ExportCSVButton';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function ExpensesPage() {
   const [page, setPage] = useState(1);
@@ -32,9 +33,9 @@ export default function ExpensesPage() {
   const totalPages = expensesQuery.data?.totalPages || 1;
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between">
-        <h2 className="text-xl font-semibold">Expenses</h2>
+    <div className="space-y-5">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-slate-800">Expenses</h2>
         <ExportCSVButton rows={data.map((e) => ({
           employee: e.userId?.name,
           merchant: e.notes,
@@ -49,10 +50,25 @@ export default function ExpensesPage() {
       <FilterBar filters={filters} setFilters={setFilters} />
       <ExpenseTable items={data} onAction={(expense, action) => setModal({ open: true, expense, action })} />
 
-      <div className="flex gap-3 items-center">
-        <button className="px-3 py-1 border rounded" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>Previous</button>
-        <span>Page {page} / {totalPages}</span>
-        <button className="px-3 py-1 border rounded" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>Next</button>
+      {/* Pagination */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-slate-500">Page {page} of {totalPages}</p>
+        <div className="flex gap-2">
+          <button
+            className="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            disabled={page <= 1}
+            onClick={() => setPage((p) => p - 1)}
+          >
+            <ChevronLeft className="w-4 h-4" /> Previous
+          </button>
+          <button
+            className="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            disabled={page >= totalPages}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            Next <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       <ApproveRejectModal

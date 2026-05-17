@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axiosClient from '../api/axiosClient';
+import { Save } from 'lucide-react';
 
 export default function SettingsPage() {
   const qc = useQueryClient();
@@ -47,25 +48,81 @@ export default function SettingsPage() {
   });
 
   return (
-    <div className="max-w-xl bg-white border rounded p-4 space-y-3">
-      <h2 className="text-xl font-semibold">Settings</h2>
-      <input className="w-full border rounded p-2" value={form.name} placeholder="Company Name" onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
-      <label className="flex items-center gap-2">
-        <input type="checkbox" checked={form.vatRegistered} onChange={(e) => setForm((f) => ({ ...f, vatRegistered: e.target.checked }))} />
-        VAT Registered
-      </label>
-      <input className="w-full border rounded p-2" type="number" value={form.vatRate} placeholder="VAT Rate" onChange={(e) => setForm((f) => ({ ...f, vatRate: e.target.value }))} />
-      <input className="w-full border rounded p-2" value={form.vatNumber} placeholder="VAT Number" onChange={(e) => setForm((f) => ({ ...f, vatNumber: e.target.value }))} />
-      <select className="w-full border rounded p-2" value={form.baseCurrency} onChange={(e) => setForm((f) => ({ ...f, baseCurrency: e.target.value }))}>
-        <option value="AED">AED</option>
-        <option value="SAR">SAR</option>
-        <option value="USD">USD</option>
-        <option value="EUR">EUR</option>
-        <option value="INR">INR</option>
-      </select>
-      <button className="px-3 py-2 bg-slate-900 text-white rounded" onClick={() => saveMutation.mutate()}>
-        Save
-      </button>
+    <div className="max-w-xl">
+      <h2 className="text-2xl font-bold text-slate-800 mb-6">Company Settings</h2>
+
+      <div className="bg-white rounded-xl shadow-sm p-6 space-y-5">
+        {/* Company Name */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1.5">Company Name</label>
+          <input
+            className="w-full border border-slate-300 rounded-md px-3.5 py-2.5 text-sm placeholder-slate-400 transition-colors"
+            value={form.name}
+            placeholder="Acme Corp"
+            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+          />
+        </div>
+
+        {/* VAT Registered */}
+        <div className="flex items-center gap-3">
+          <input
+            id="vatRegistered"
+            type="checkbox"
+            checked={form.vatRegistered}
+            onChange={(e) => setForm((f) => ({ ...f, vatRegistered: e.target.checked }))}
+            className="w-4 h-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+          />
+          <label htmlFor="vatRegistered" className="text-sm font-medium text-slate-700">VAT Registered</label>
+        </div>
+
+        {/* VAT Rate */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1.5">VAT Rate (%)</label>
+          <input
+            className="w-full border border-slate-300 rounded-md px-3.5 py-2.5 text-sm placeholder-slate-400 transition-colors"
+            type="number"
+            value={form.vatRate}
+            placeholder="5"
+            onChange={(e) => setForm((f) => ({ ...f, vatRate: e.target.value }))}
+          />
+        </div>
+
+        {/* VAT Number */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1.5">VAT Number</label>
+          <input
+            className="w-full border border-slate-300 rounded-md px-3.5 py-2.5 text-sm placeholder-slate-400 transition-colors"
+            value={form.vatNumber}
+            placeholder="TRN1234567890"
+            onChange={(e) => setForm((f) => ({ ...f, vatNumber: e.target.value }))}
+          />
+        </div>
+
+        {/* Base Currency */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1.5">Base Currency</label>
+          <select
+            className="w-full border border-slate-300 rounded-md px-3.5 py-2.5 text-sm text-slate-700 transition-colors"
+            value={form.baseCurrency}
+            onChange={(e) => setForm((f) => ({ ...f, baseCurrency: e.target.value }))}
+          >
+            <option value="AED">AED</option>
+            <option value="SAR">SAR</option>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="INR">INR</option>
+          </select>
+        </div>
+
+        {/* Save */}
+        <button
+          className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md px-5 py-2.5 text-sm transition-colors"
+          onClick={() => saveMutation.mutate()}
+        >
+          <Save className="w-4 h-4" />
+          Save Changes
+        </button>
+      </div>
     </div>
   );
 }

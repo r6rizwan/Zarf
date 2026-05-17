@@ -5,27 +5,43 @@ export default function ApproveRejectModal({ open, onClose, onConfirm, action })
 
   if (!open) return null;
 
+  const isApprove = action === 'approved';
+
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-4">
-      <div className="bg-white rounded border p-4 w-full max-w-md">
-        <h3 className="font-semibold">{action === 'approved' ? 'Approve' : 'Reject'} Expense</h3>
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md animate-in">
+        <h3 className="text-lg font-semibold text-slate-800">
+          {isApprove ? 'Approve' : 'Reject'} Expense
+        </h3>
+        <p className="text-sm text-slate-500 mt-1">
+          {isApprove ? 'Confirm approval of this expense claim.' : 'Provide a reason for rejecting this expense.'}
+        </p>
         <textarea
-          className="w-full border rounded mt-3 p-2"
+          className="w-full border border-slate-300 rounded-lg mt-4 p-3 text-sm placeholder-slate-400 resize-none transition-colors"
           rows={4}
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="Comment (optional)"
+          placeholder="Add a comment (optional)"
         />
-        <div className="flex justify-end gap-2 mt-3">
-          <button className="px-3 py-1 border rounded" onClick={onClose}>Cancel</button>
+        <div className="flex justify-end gap-3 mt-4">
           <button
-            className="px-3 py-1 bg-slate-900 text-white rounded"
+            className="px-4 py-2 text-sm font-medium border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors"
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+          <button
+            className={`px-4 py-2 text-sm font-medium rounded-lg text-white transition-colors ${
+              isApprove
+                ? 'bg-emerald-600 hover:bg-emerald-700'
+                : 'bg-rose-600 hover:bg-rose-700'
+            }`}
             onClick={() => {
               onConfirm(note);
               setNote('');
             }}
           >
-            Confirm
+            {isApprove ? 'Approve' : 'Reject'}
           </button>
         </div>
       </div>

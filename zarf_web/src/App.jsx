@@ -9,13 +9,13 @@ import Sidebar from './components/layout/Sidebar';
 import TopBar from './components/layout/TopBar';
 import { useAuthStore } from './store/authStore';
 
-function AppLayout({ children }) {
+function AppLayout({ title, children }) {
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen" style={{ backgroundColor: '#f8fafc' }}>
       <Sidebar />
-      <div className="flex-1">
-        <TopBar />
-        <main className="p-6">{children}</main>
+      <div className="flex-1 flex flex-col">
+        <TopBar title={title} />
+        <main className="flex-1 p-6">{children}</main>
       </div>
     </div>
   );
@@ -31,7 +31,7 @@ export default function App() {
         path="/dashboard"
         element={
           <ProtectedRoute allowedRoles={['manager', 'admin']}>
-            <AppLayout>
+            <AppLayout title="Dashboard">
               <DashboardPage />
             </AppLayout>
           </ProtectedRoute>
@@ -41,7 +41,7 @@ export default function App() {
         path="/expenses"
         element={
           <ProtectedRoute allowedRoles={['manager', 'admin']}>
-            <AppLayout>
+            <AppLayout title="Expenses">
               <ExpensesPage />
             </AppLayout>
           </ProtectedRoute>
@@ -51,7 +51,7 @@ export default function App() {
         path="/employees"
         element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <AppLayout>
+            <AppLayout title="Employees">
               <EmployeesPage />
             </AppLayout>
           </ProtectedRoute>
@@ -61,7 +61,7 @@ export default function App() {
         path="/settings"
         element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <AppLayout>
+            <AppLayout title="Settings">
               <SettingsPage />
             </AppLayout>
           </ProtectedRoute>

@@ -8,6 +8,8 @@ import MonthlySpendChart from '../components/charts/MonthlySpendChart';
 
 const getMonthYear = (date) => ({ month: date.getMonth() + 1, year: date.getFullYear() });
 
+const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 export default function DashboardPage() {
   const [selected, setSelected] = useState(new Date());
   const { month, year } = getMonthYear(selected);
@@ -40,29 +42,38 @@ export default function DashboardPage() {
   }));
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Header */}
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Dashboard</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-slate-800">Dashboard</h2>
+          <span className="inline-flex items-center text-xs font-semibold text-teal-700 bg-teal-50 px-2.5 py-1 rounded-full">
+            {monthNames[month - 1]} {year}
+          </span>
+        </div>
         <input
           type="month"
           value={`${year}-${String(month).padStart(2, '0')}`}
           onChange={(e) => setSelected(new Date(`${e.target.value}-01`))}
-          className="border rounded px-2 py-1"
+          className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-600"
         />
       </div>
 
-      <div className="grid md:grid-cols-4 gap-3">
+      {/* Stat cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Total Spend" value={summaryQuery.data?.totalSpend ?? 0} />
         <StatCard label="Pending Approvals" value={summaryQuery.data?.pendingCount ?? 0} />
         <StatCard label="Approved Total" value={summaryQuery.data?.approvedTotal ?? 0} />
         <StatCard label="Total VAT" value={summaryQuery.data?.totalVAT ?? 0} />
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <MonthlySpendChart data={last6Months} />
         <SpendByCategoryChart data={categoryQuery.data || []} />
       </div>
 
+      {/* VAT */}
       <VATSummaryCard report={vatQuery.data} />
     </div>
   );
