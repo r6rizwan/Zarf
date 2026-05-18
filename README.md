@@ -52,6 +52,14 @@ Zarf is structured with a strict, multi-tenant B2B separation of concerns across
 | Storage | Cloudinary |
 | Auth | JWT with refresh token rotation |
 
+## 🔒 Security & Data Privacy
+Zarf prioritizes enterprise-grade security and user privacy across all architectural integrations:
+
+*   **☁️ Cloudinary Secure Storage:** Uploaded physical receipts are stored securely on Cloudinary. These image assets are fully private and accessible only via authorized backend-to-client secure sessions.
+*   **🤖 Groq AI Receipt Parsing:** Receipt images are processed securely using the Groq API. **Zero personal data or transaction info shared with Groq is stored, logged, or utilized to train public AI models.**
+*   **🔔 Firebase Cloud Messaging (FCM):** Device tokens are securely managed and processed strictly to deliver real-time push notifications when transaction statuses change.
+*   **🛡️ Hardened Backend API:** Configured with a global rate-limiter, a strict separate AI cost-limiter, custom production-mode error sanitization (stack traces are never leaked), and a complete set of standard secure HTTP response headers (CSP, HSTS, XSS protection, MIME protection).
+
 ## Project Structure
 ```text
 zarf/
