@@ -73,6 +73,14 @@ flutter pub get
 flutter run
 ```
 
+#### Automated Production Builds (Custom APK)
+To compile a release build with a custom output name (`zarf.apk`) ready for distribution, run the automated pipeline from the root folder:
+```bash
+./build_apk.sh
+```
+This automatically handles cache cleaning, package updates, and compiles the release binary to:
+📂 **`build_artifacts/zarf.apk`**
+
 Firebase (Android):
 - Package name is `com.zarf.mobile`
 - Place Firebase config at `zarf_mobile/android/app/google-services.json`
@@ -92,8 +100,18 @@ React env:
 ```bash
 cd zarf_backend
 node src/scripts/seed.js
-# admin@zarf.demo / Admin@1234
 ```
+
+### 🔑 Demo Credentials
+Recruiters and reviewers can use the following pre-seeded test accounts to explore the role-based features of the Zarf platform:
+
+| Role | Email | Password | Allowed Capabilities |
+|------|-------|----------|----------------------|
+| **Admin** | `admin@zarf.demo` | `Admin@1234` | Full access, settings edit (VAT configurations), finance dashboard |
+| **Manager** | `manager1@zarf.demo` | `Manager@1234` | Approve/Reject expense queues, view personal home dashboard |
+| **Employee** | `employee1@zarf.demo` | `Employee@1234` | Submit expenses, receipt AI OCR scanning, view personal history |
+
+*(Employee accounts range from `employee1` to `employee5`, and managers range from `manager1` to `manager2`)*
 
 ## Demo
 - Web App: [Live Dashboard](https://zarf-cyan.vercel.app)
@@ -105,3 +123,4 @@ node src/scripts/seed.js
 - All Flutter layouts use DirectionalityAware alignment
 - Arabic RTL localization is in the roadmap
 - Mobile expense lists auto-refresh (polling + app resume + return from detail)
+- Nested stateful navigation (StatefulShellRoute tab caching) preventing redundant API re-fetching and preserving UI scroll positions

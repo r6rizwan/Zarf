@@ -11,8 +11,8 @@ class ApiService {
   ApiService._();
   static final ApiService instance = ApiService._();
 
-  // static const _baseUrl = 'http://localhost:3000/api/v1';
-  static const _baseUrl = 'http://10.0.2.2:3000/api/v1';
+  // static const _baseUrl = 'http://10.0.2.2:3000/api/v1';
+  static const _baseUrl = 'https://zarf-backend.onrender.com/api/v1';
 
   static const _accessTokenKey = 'accessToken';
   static const _refreshTokenKey = 'refreshToken';

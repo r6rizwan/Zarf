@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../../data/models/expense.dart';
 import '../../data/repositories/expense_repo.dart';
 
@@ -30,7 +32,9 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
     WidgetsBinding.instance.addObserver(this);
     _load(reset: true);
     _scroll.addListener(() {
-      if (_scroll.position.pixels >= _scroll.position.maxScrollExtent - 100 && !_loading && _page < _totalPages) {
+      if (_scroll.position.pixels >= _scroll.position.maxScrollExtent - 100 &&
+          !_loading &&
+          _page < _totalPages) {
         _load();
       }
     });
@@ -42,15 +46,30 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
   Future<void> _load({bool reset = false}) async {
     if (_loading) return;
     setState(() => _loading = true);
-    final nextPage = reset ? 1 : _page + 1;
-    final res = await _repo.getExpenses(status: _status, page: nextPage, limit: 20);
-    setState(() {
-      _page = res['page'];
-      _totalPages = res['totalPages'];
-      if (reset) _items.clear();
-      _items.addAll((res['data'] as List<Expense>));
-      _loading = false;
-    });
+    try {
+      final nextPage = reset ? 1 : _page + 1;
+      final res =
+          await _repo.getExpenses(status: _status, page: nextPage, limit: 20);
+      if (!mounted) return;
+      setState(() {
+        _page = res['page'];
+        _totalPages = res['totalPages'];
+        if (reset) _items.clear();
+        _items.addAll((res['data'] as List<Expense>));
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text(
+                  'Failed to load expenses. Please check your connection.')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
   }
 
   @override
@@ -68,6 +87,49 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
     super.dispose();
   }
 
+  Widget _buildStatusBadge(String status) {
+    Color color;
+    switch (status.toLowerCase()) {
+      case 'approved':
+        color = AppTheme.success;
+        break;
+      case 'rejected':
+        color = AppTheme.error;
+        break;
+      case 'pending':
+      default:
+        color = AppTheme.warning;
+        break;
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(100),
+      ),
+      child: Text(
+        status.toUpperCase(),
+        style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            letterSpacing: 0.5),
+      ),
+    );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'approved':
+        return AppTheme.success;
+      case 'rejected':
+        return AppTheme.error;
+      case 'pending':
+      default:
+        return AppTheme.warning;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,40 +141,175 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
           children: [
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               child: Row(
                 children: [
-                  for (final item in const ['', 'pending', 'approved', 'rejected'])
+                  for (final item in const [
+                    '',
+                    'pending',
+                    'approved',
+                    'rejected'
+                  ])
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-                      child: ChoiceChip(
-                        label: Text(item.isEmpty ? 'All' : item),
-                        selected: _status == item,
-                        onSelected: (_) {
+                      padding: const EdgeInsets.only(right: 8),
+                      child: GestureDetector(
+                        onTap: () {
                           setState(() => _status = item);
                           _load(reset: true);
                         },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: _status == item
+                                ? AppTheme.primaryTeal
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(100),
+                            border: Border.all(
+                                color: _status == item
+                                    ? AppTheme.primaryTeal
+                                    : AppTheme.borderColor),
+                          ),
+                          child: Text(
+                            item.isEmpty
+                                ? 'All'
+                                : item[0].toUpperCase() + item.substring(1),
+                            style: TextStyle(
+                              color: _status == item
+                                  ? Colors.white
+                                  : AppTheme.primaryTeal,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                 ],
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                controller: _scroll,
-                itemCount: _items.length + (_loading ? 1 : 0),
-                itemBuilder: (_, i) {
-                  if (i >= _items.length) return const Center(child: CircularProgressIndicator());
-                  final expense = _items[i];
-                  return ListTile(
-                    title: Text('${expense.category} - ${expense.amount} ${expense.currency}', textAlign: TextAlign.start),
-                    subtitle: Text(expense.status, textAlign: TextAlign.start),
-                    onTap: () async {
-                      await context.push('/expense/${expense.id}');
-                      _load(reset: true);
-                    },
-                  );
-                },
-              ),
+              child: _items.isEmpty && !_loading
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.receipt_long,
+                              size: 80,
+                              color:
+                                  AppTheme.primaryTeal.withValues(alpha: 0.3)),
+                          const SizedBox(height: 16),
+                          const Text('No expenses yet',
+                              style: TextStyle(
+                                  color: AppTheme.textSecondary, fontSize: 16)),
+                        ],
+                      ),
+                    )
+                  : ListView.separated(
+                      controller: _scroll,
+                      padding: const EdgeInsets.all(20),
+                      itemCount: _items.length + (_loading ? 1 : 0),
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (_, i) {
+                        if (i >= _items.length) {
+                          return const Center(
+                              child: Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: CircularProgressIndicator()));
+                        }
+                        final expense = _items[i];
+                        return GestureDetector(
+                          onTap: () async {
+                            await context.push('/expense/${expense.id}');
+                            _load(reset: true);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: const Border(
+                                top: BorderSide(color: AppTheme.borderColor),
+                                right: BorderSide(color: AppTheme.borderColor),
+                                bottom: BorderSide(color: AppTheme.borderColor),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.02),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2)),
+                              ],
+                            ),
+                            child: IntrinsicHeight(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  // Colored left border
+                                  Container(
+                                    width: 6,
+                                    decoration: BoxDecoration(
+                                      color: _getStatusColor(expense.status),
+                                      borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(12),
+                                          bottomLeft: Radius.circular(12)),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(expense.category,
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 16,
+                                                      color: AppTheme
+                                                          .textPrimary)),
+                                              Text(
+                                                '${expense.currency} ${NumberFormat('#,##0.00').format(expense.amount)}',
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16,
+                                                    color:
+                                                        AppTheme.primaryTeal),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 12),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            children: [
+                                              _buildStatusBadge(expense.status),
+                                              Text(
+                                                expense.date
+                                                    .toIso8601String()
+                                                    .split('T')
+                                                    .first,
+                                                style: const TextStyle(
+                                                    color:
+                                                        AppTheme.textSecondary,
+                                                    fontSize: 12),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
             ),
           ],
         ),

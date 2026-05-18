@@ -125,6 +125,10 @@ Full-stack corporate expense management app targeting UAE/GCC market.
 - [~] App icon + splash screen
 - [~] Build release APK — attach to GitHub releases
 - [x] Expense status sync improvements — auto-refresh list on resume/poll/detail return
+- [x] Stateful navigation transition — swapped ShellRoute for StatefulShellRoute to cache tab state and prevent redundant API queries
+- [x] Manager navigation split — dynamic 4-tab bottom bar allowing managers to access the home dashboard alongside approvals
+- [x] Numeric formatting polish — standardized decimals and comma separators across all expense list items (e.g. AED 1,000.00)
+- [x] Manager Review feedback — refined approvals with contextual SnackBar success states, keyboard dismissal, and form reset
 
 ### React
 - [x] Deploy to Vercel (free tier)

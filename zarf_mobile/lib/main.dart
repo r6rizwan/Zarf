@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'core/router/app_router.dart';
+import 'core/theme/app_theme.dart';
 import 'data/services/api_service.dart';
 import 'data/services/notification_service.dart';
 
@@ -18,12 +19,11 @@ class ZarfApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: MaterialApp.router(
-        title: 'Zarf',
-        routerConfig: AppRouter.router,
-      ),
+    return MaterialApp.router(
+      title: 'Zarf',
+      theme: AppTheme.lightTheme,
+      routerConfig: AppRouter.router,
+      debugShowCheckedModeBanner: false,
     );
   }
 }

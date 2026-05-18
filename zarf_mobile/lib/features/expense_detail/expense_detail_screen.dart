@@ -18,6 +18,7 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
   final _repo = ExpenseRepo();
   Expense? expense;
   User? _user;
+  bool _hasError = false;
 
   @override
   void initState() {
@@ -26,62 +27,148 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
   }
 
   Future<void> _load() async {
-    final e = await _repo.getExpenseById(widget.id);
-    final user = await ApiService.instance.getCurrentUser();
-    setState(() {
-      expense = e;
-      _user = user;
-    });
+    try {
+      final e = await _repo.getExpenseById(widget.id);
+      final user = await ApiService.instance.getCurrentUser();
+      setState(() {
+        expense = e;
+        _user = user;
+      });
+    } catch (e) {
+      if (mounted) {
+        setState(() => _hasError = true);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to load expense details.')),
+        );
+      }
+    }
   }
 
-  Future<void> _openApproveRejectSheet(String status) async {
-    final controller = TextEditingController();
-    final note = await showModalBottomSheet<String>(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 16,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(status == 'approved' ? 'Approve Expense' : 'Reject Expense',
-                  textAlign: TextAlign.start),
-              const SizedBox(height: 8),
-              TextField(
-                controller: controller,
-                decoration:
-                    const InputDecoration(labelText: 'Comment (optional)'),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () =>
-                      Navigator.of(context).pop(controller.text.trim()),
-                  child: const Text('Confirm'),
-                ),
-              ),
-            ],
+  final _commentController = TextEditingController();
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submitReview(String status) async {
+    final note = _commentController.text.trim();
+    FocusScope.of(context).unfocus();
+    try {
+      await _repo.updateStatus(widget.id, status, note.isEmpty ? null : note);
+      _commentController.clear();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Expense ${status == 'approved' ? 'approved' : 'rejected'} successfully'),
+            backgroundColor: status == 'approved' ? const Color(0xFF22C55E) : const Color(0xFFEF4444),
           ),
         );
-      },
-    );
+      }
+      await _load();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to update status.')),
+        );
+      }
+    }
+  }
 
-    await _repo.updateStatus(
-        widget.id, status, note == null || note.isEmpty ? null : note);
-    await _load();
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(label,
+                style: const TextStyle(
+                    fontWeight: FontWeight.w500, color: Color(0xFF64748B))),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(value,
+                style: const TextStyle(
+                    fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
+                textAlign: TextAlign.right),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge(String status) {
+    Color color;
+    switch (status.toLowerCase()) {
+      case 'approved':
+        color = const Color(0xFF22C55E);
+        break;
+      case 'rejected':
+        color = const Color(0xFFEF4444);
+        break;
+      case 'pending':
+      default:
+        color = const Color(0xFFF59E0B);
+        break;
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      decoration:
+          BoxDecoration(color: color, borderRadius: BorderRadius.circular(100)),
+      child: Text(status.toUpperCase(),
+          style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              letterSpacing: 0.5)),
+    );
+  }
+
+  void _viewReceipt(String url) {
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        insetPadding: EdgeInsets.zero,
+        backgroundColor: Colors.transparent,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            InteractiveViewer(
+              child: CachedNetworkImage(
+                imageUrl: url,
+                placeholder: (context, url) =>
+                    const CircularProgressIndicator(),
+                errorWidget: (context, url, error) =>
+                    const Icon(Icons.error, color: Colors.white, size: 48),
+              ),
+            ),
+            Positioned(
+              top: 40,
+              right: 20,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white, size: 32),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final e = expense;
+    if (_hasError) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Expense Detail')),
+        body: const Center(
+            child: Text('Failed to load expense. Please try again.')),
+      );
+    }
     if (e == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -91,50 +178,201 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Expense Detail')),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        child: ListView(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Amount: ${e.amount} ${e.currency}',
-                textAlign: TextAlign.start),
-            if (e.amountBase != null)
-              Text('Base Amount: ${e.amountBase}', textAlign: TextAlign.start),
-            Text('Category: ${e.category}', textAlign: TextAlign.start),
-            Text('Status: ${e.status}', textAlign: TextAlign.start),
-            Text('Date: ${e.date.toIso8601String().split('T').first}',
-                textAlign: TextAlign.start),
-            if (e.notes != null && e.notes!.isNotEmpty)
-              Text('Notes: ${e.notes}', textAlign: TextAlign.start),
-            if (e.vatApplicable)
-              Text('VAT: ${e.vatAmount}', textAlign: TextAlign.start),
-            if (e.receiptUrl != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: CachedNetworkImage(imageUrl: e.receiptUrl!),
-              ),
-            if (canReview) ...[
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => _openApproveRejectSheet('approved'),
-                      child: const Text('Approve'),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => _openApproveRejectSheet('rejected'),
-                      child: const Text('Reject'),
-                    ),
-                  ),
+            // Top hero card
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.02),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2)),
                 ],
               ),
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                children: [
+                  _buildStatusBadge(e.status),
+                  const SizedBox(height: 16),
+                  Text(
+                    'AED ${e.amount.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF0D9488)),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(e.category,
+                      style: const TextStyle(
+                          fontSize: 16, color: Color(0xFF64748B))),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Details section
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: Column(
+                children: [
+                  _buildDetailRow('Category', e.category),
+                  const Divider(color: Color(0xFFE2E8F0), height: 1),
+                  _buildDetailRow('Payment Method', e.paymentMethod ?? 'N/A'),
+                  const Divider(color: Color(0xFFE2E8F0), height: 1),
+                  _buildDetailRow(
+                      'Date', e.date.toIso8601String().split('T').first),
+                  const Divider(color: Color(0xFFE2E8F0), height: 1),
+                  _buildDetailRow(
+                      'Base Amount',
+                      e.amountBase != null
+                          ? 'AED ${e.amountBase!.toStringAsFixed(2)}'
+                          : 'N/A'),
+                  const Divider(color: Color(0xFFE2E8F0), height: 1),
+                  _buildDetailRow(
+                      'VAT Amount',
+                      e.vatApplicable
+                          ? 'AED ${e.vatAmount.toStringAsFixed(2)}'
+                          : 'N/A'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            if (e.vatApplicable)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0D9488).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline, color: Color(0xFF0D9488)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'VAT Included: AED ${e.vatAmount.toStringAsFixed(2)} at 5%',
+                        style: const TextStyle(
+                            color: Color(0xFF0D9488),
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+            if (e.notes != null && e.notes!.isNotEmpty) ...[
+              const SizedBox(height: 24),
+              const Text('NOTES',
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF64748B),
+                      letterSpacing: 1.2)),
+              const SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Text(e.notes!,
+                    style: const TextStyle(color: Color(0xFF0F172A))),
+              ),
             ],
+
+            if (e.receiptUrl != null) ...[
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: OutlinedButton(
+                  onPressed: () => _viewReceipt(e.receiptUrl!),
+                  child: const Text('View Receipt'),
+                ),
+              ),
+            ],
+
+            SizedBox(height: canReview ? 200 : 40),
           ],
         ),
       ),
+      bottomSheet: canReview
+          ? Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, -5))
+                ],
+              ),
+              child: SafeArea(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: _commentController,
+                      decoration: const InputDecoration(
+                        labelText: 'Add a comment (optional)',
+                        filled: true,
+                        fillColor: Color(0xFFF8FAFC),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: SizedBox(
+                            height: 52,
+                            child: OutlinedButton(
+                              onPressed: () => _submitReview('rejected'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(0xFFEF4444),
+                                side: const BorderSide(
+                                    color: Color(0xFFEF4444), width: 1.5),
+                              ),
+                              child: const Text('Reject'),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: SizedBox(
+                            height: 52,
+                            child: ElevatedButton(
+                              onPressed: () => _submitReview('approved'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF0D9488),
+                                foregroundColor: Colors.white,
+                              ),
+                              child: const Text('Approve'),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : null,
     );
   }
 }
