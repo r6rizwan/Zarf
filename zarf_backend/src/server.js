@@ -13,6 +13,9 @@ import { securityHeaders } from './middleware/security.js';
 
 const app = express();
 
+// Trust reverse proxy (Render, Heroku, AWS ALB) for express-rate-limit IP detection
+app.set('trust proxy', 1);
+
 app.use(securityHeaders);
 
 app.use(
