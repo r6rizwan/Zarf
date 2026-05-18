@@ -127,6 +127,12 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
           _category = matchedCategory;
         }
       }
+      if (parsed.vatApplicable != null) {
+        _vatApplicable = parsed.vatApplicable!;
+      }
+      if (parsed.vatAmount != null && parsed.vatAmount! > 0) {
+        _vatAmount = parsed.vatAmount!;
+      }
     });
   }
 
