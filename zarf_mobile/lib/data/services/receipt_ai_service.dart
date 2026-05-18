@@ -49,7 +49,12 @@ class ReceiptAiService {
   }
 
   Future<ParsedReceipt?> pickAndParseReceipt(ImageSource source) async {
-    final image = await _picker.pickImage(source: source);
+    final image = await _picker.pickImage(
+      source: source,
+      maxWidth: 1024,
+      maxHeight: 1024,
+      imageQuality: 85,
+    );
     if (image == null) return null;
     return parseReceiptFile(image);
   }
