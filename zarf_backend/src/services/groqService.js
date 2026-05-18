@@ -9,11 +9,14 @@ const extractionPrompt =
 const parseAndValidate = (rawText) => {
   let parsed;
   try {
-    // Strip markdown code block wrappers (e.g., ```json ... ```) if present
-    const cleaned = rawText.replace(/```(json)?/g, '').replace(/```/g, '').trim();
-    parsed = JSON.parse(cleaned);
-  } catch {
-    throw new Error('Groq response was not valid JSON');
+    // Extract the JSON object matching block between { and } (including nested structures)
+    const match = rawText.match(/\{[\s\S]*\}/);
+    if (!match) {
+      throw new Error('No JSON object found in response');
+    }
+    parsed = JSON.parse(match[0].trim());
+  } catch (err) {
+    throw new Error(`Groq response was not valid JSON: ${err.message}`);
   }
 
   const normalized = {
