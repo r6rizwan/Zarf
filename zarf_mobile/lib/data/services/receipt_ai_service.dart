@@ -30,8 +30,8 @@ class ReceiptAiService {
   final _api = ApiService.instance;
   final _picker = ImagePicker();
 
-  Future<ParsedReceipt?> pickAndParseReceipt() async {
-    final image = await _picker.pickImage(source: ImageSource.camera);
+  Future<ParsedReceipt?> pickAndParseReceipt(ImageSource source) async {
+    final image = await _picker.pickImage(source: source);
     if (image == null) return null;
 
     try {
@@ -45,7 +45,8 @@ class ReceiptAiService {
       if (res.data['success'] != true) return null;
       return ParsedReceipt.fromJson(
           Map<String, dynamic>.from(res.data['data']));
-    } catch (_) {
+    } catch (e) {
+      print('Receipt Parsing Error: $e');
       return null;
     }
   }

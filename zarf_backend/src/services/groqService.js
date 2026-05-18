@@ -39,7 +39,7 @@ export const parseReceipt = async ({ imageBuffer, mimetype }) => {
   const dataUrl = `data:${mimetype};base64,${base64}`;
 
   const completion = await groq.chat.completions.create({
-    model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+    model: 'llama-3.2-11b-vision-preview',
     temperature: 0,
     messages: [
       { role: 'user', content: [
