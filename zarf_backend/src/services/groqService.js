@@ -9,7 +9,9 @@ const extractionPrompt =
 const parseAndValidate = (rawText) => {
   let parsed;
   try {
-    parsed = JSON.parse(rawText);
+    // Strip markdown code block wrappers (e.g., ```json ... ```) if present
+    const cleaned = rawText.replace(/```(json)?/g, '').replace(/```/g, '').trim();
+    parsed = JSON.parse(cleaned);
   } catch {
     throw new Error('Groq response was not valid JSON');
   }
