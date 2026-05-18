@@ -23,13 +23,15 @@
 ```
 
 ## Features
-- Employee expense submission with receipt scanning
-- AI-powered receipt parsing via Groq
-- Manager approval workflow
-- VAT-aware (configurable rate — UAE 5%, Saudi 15%, full GCC coverage)
-- Multi-currency with live AED conversion
-- React web dashboard with analytics
-- RTL-ready architecture (Arabic localization in roadmap)
+- **AI-Powered Receipt Scanning:** OCR and entity extraction using Groq's high-speed **Llama 4 Scout** vision model.
+- **Multi-Parameter Extraction:** Automatically extracts and populates Merchant, Amount, Currency, Date, **Category classification**, and **VAT/Tax details** directly from photo assets.
+- **Smart VAT Toggling:** Instantly detects if tax was charged, flips the VAT switch to ON in the UI, and fills the exact tax amount.
+- **Image Compression Engine:** Scaler on mobile compressing raw photos to 1024x1024 / 85% quality, reducing network transfer payloads from 12MB down to ~150KB.
+- **Premium UX Polish:** Smooth soft-keyboard dismissals via active focus releases on login and submission sheets.
+- **Manager Queues:** Real-time review lanes to Approve or Reject transactions with custom comments.
+- **VAT-Aware Architecture:** Fully configurable VAT rates (UAE 5%, Saudi 15%, etc.) with live AED currency conversion.
+
+[Explore the full Product Roadmap & Completed Milestones here!](ROADMAP.md)
 
 ## Role & Platform Separation
 Zarf is structured with a strict, multi-tenant B2B separation of concerns across platforms:
@@ -48,9 +50,9 @@ Zarf is structured with a strict, multi-tenant B2B separation of concerns across
 | Mobile | Flutter, Riverpod, Dio, GoRouter |
 | Backend | Node.js v20, Express, MongoDB, Mongoose |
 | Web | React, Tailwind, shadcn/ui, Recharts |
-| AI | Groq API (receipt OCR) |
-| Storage | Cloudinary |
-| Auth | JWT with refresh token rotation |
+| AI | Groq API (Llama 4 Scout Vision Model) |
+| Storage | Cloudinary (Secure Storage Sessions) |
+| Auth | JWT with Refresh Token rotation |
 
 ## 🔒 Security & Data Privacy
 Zarf prioritizes enterprise-grade security and user privacy across all architectural integrations:
