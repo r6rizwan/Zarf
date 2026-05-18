@@ -31,6 +31,17 @@
 - React web dashboard with analytics
 - RTL-ready architecture (Arabic localization in roadmap)
 
+## Role & Platform Separation
+Zarf is structured with a strict, multi-tenant B2B separation of concerns across platforms:
+
+*   **📱 Flutter Mobile App (Employee & Manager Focus):**
+    *   **Employees:** Submit expenses, snap pictures of physical receipts for instant AI-powered OCR parsing, and monitor reimbursement statuses.
+    *   **Managers & Admins:** Access a dedicated fourth tab for review queues to quickly Approve or Reject transactions with custom comments on the go, alongside their personal dashboards.
+*   **💻 React Web App (Manager & Admin Focus):**
+    *   **Employees:** Are **blocked** from logging in (directed to the native mobile experience).
+    *   **Managers:** Audit expenses in a tabular spreadsheet, perform reviews, and export CSVs.
+    *   **Admins:** Have unrestricted access, including the employee spending directory and core settings (VAT rate adjustments, base currency changes, TRN settings).
+
 ## Tech Stack
 | Layer | Tech |
 |-------|------|
