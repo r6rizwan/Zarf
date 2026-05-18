@@ -9,8 +9,11 @@ import analyticsRoutes from './routes/analytics.routes.js';
 import userRoutes from './routes/user.routes.js';
 import { generalLimiter } from './middleware/rateLimiter.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { securityHeaders } from './middleware/security.js';
 
 const app = express();
+
+app.use(securityHeaders);
 
 app.use(
   cors({
