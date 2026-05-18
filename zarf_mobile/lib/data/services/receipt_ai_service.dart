@@ -30,10 +30,7 @@ class ReceiptAiService {
   final _api = ApiService.instance;
   final _picker = ImagePicker();
 
-  Future<ParsedReceipt?> pickAndParseReceipt(ImageSource source) async {
-    final image = await _picker.pickImage(source: source);
-    if (image == null) return null;
-
+  Future<ParsedReceipt?> parseReceiptFile(XFile image) async {
     try {
       final fileName = image.name.isNotEmpty ? image.name : 'receipt.jpg';
       final formData = FormData.fromMap({
@@ -49,5 +46,11 @@ class ReceiptAiService {
       print('Receipt Parsing Error: $e');
       return null;
     }
+  }
+
+  Future<ParsedReceipt?> pickAndParseReceipt(ImageSource source) async {
+    final image = await _picker.pickImage(source: source);
+    if (image == null) return null;
+    return parseReceiptFile(image);
   }
 }

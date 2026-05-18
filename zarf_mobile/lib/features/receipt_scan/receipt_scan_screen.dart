@@ -15,8 +15,12 @@ class _ReceiptScanScreenState extends State<ReceiptScanScreen> {
   bool _loading = false;
 
   Future<void> _capture(ImageSource source) async {
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: source);
+    if (image == null) return; // User cancelled the camera/gallery, do nothing!
+
     setState(() => _loading = true);
-    final parsed = await _service.pickAndParseReceipt(source);
+    final parsed = await _service.parseReceiptFile(image);
     if (!mounted) return;
 
     setState(() => _loading = false);
