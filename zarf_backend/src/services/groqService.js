@@ -4,7 +4,7 @@ import env from '../config/env.js';
 const groq = new Groq({ apiKey: env.GROQ_API_KEY });
 
 const extractionPrompt =
-  'Extract the following fields from this receipt image and return ONLY a JSON object with no markdown or explanation: { merchant: string, amount: number, currency: string (3-letter ISO), date: string (YYYY-MM-DD) } If a field cannot be determined, set it to null.';
+  'Extract the following fields from this receipt image and return ONLY a JSON object with no markdown or explanation: { merchant: string, amount: number, currency: string (3-letter ISO), date: string (YYYY-MM-DD), category: string } For category, infer the closest option from this list: ["Travel", "Meals", "Accommodation", "Office Supplies", "Client Entertainment", "Other"]. If a field cannot be determined, set it to null.';
 
 const parseAndValidate = (rawText) => {
   let parsed;
@@ -23,14 +23,16 @@ const parseAndValidate = (rawText) => {
     merchant: parsed.merchant ?? null,
     amount: parsed.amount ?? null,
     currency: parsed.currency ?? null,
-    date: parsed.date ?? null
+    date: parsed.date ?? null,
+    category: parsed.category ?? null
   };
 
   const validTypes =
     (normalized.merchant === null || typeof normalized.merchant === 'string') &&
     (normalized.amount === null || typeof normalized.amount === 'number') &&
     (normalized.currency === null || typeof normalized.currency === 'string') &&
-    (normalized.date === null || typeof normalized.date === 'string');
+    (normalized.date === null || typeof normalized.date === 'string') &&
+    (normalized.category === null || typeof normalized.category === 'string');
 
   if (!validTypes) {
     throw new Error('Groq response had invalid field types');

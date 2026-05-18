@@ -33,6 +33,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
 
   Future<void> _submit() async {
     if (_loading) return;
+    FocusScope.of(context).unfocus(); // Dismiss keyboard and clear active focus
     setState(() => _loading = true);
     try {
       final amount = num.tryParse(_amount.text) ?? 0;
@@ -62,6 +63,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
   }
 
   Future<void> _pickDate() async {
+    FocusScope.of(context).unfocus(); // Dismiss keyboard on date picker trigger
     final picked = await showDatePicker(
       context: context,
       initialDate: _date,
@@ -95,6 +97,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
   }
 
   Future<void> _scanReceipt() async {
+    FocusScope.of(context).unfocus(); // Dismiss keyboard on scan trigger
     final parsed = await context.push<ParsedReceipt>('/receipt-scan');
     if (parsed == null) return;
 
@@ -114,6 +117,15 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
       if (parsed.merchant != null && parsed.merchant!.trim().isNotEmpty) {
         _notes.text = parsed.merchant!.trim();
         _aiNotes = true;
+      }
+      if (parsed.category != null) {
+        final matchedCategory = expenseCategories.firstWhere(
+          (cat) => cat.toLowerCase() == parsed.category!.trim().toLowerCase(),
+          orElse: () => '',
+        );
+        if (matchedCategory.isNotEmpty) {
+          _category = matchedCategory;
+        }
       }
     });
   }

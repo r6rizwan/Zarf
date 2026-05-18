@@ -19,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _error;
 
   Future<void> _submit() async {
+    FocusScope.of(context).unfocus(); // Dismiss soft keyboard and clear active focus
     setState(() {
       _loading = true;
       _error = null;

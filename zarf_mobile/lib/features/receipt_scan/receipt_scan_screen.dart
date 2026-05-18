@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../data/services/receipt_ai_service.dart';
 
@@ -25,21 +27,36 @@ class _ReceiptScanScreenState extends State<ReceiptScanScreen> {
     if (image == null) return; // User cancelled the camera/gallery, do nothing!
 
     setState(() => _loading = true);
-    final parsed = await _service.parseReceiptFile(image);
-    if (!mounted) return;
+    try {
+      final parsed = await _service.parseReceiptFile(image);
+      if (!mounted) return;
+      setState(() => _loading = false);
+      context.pop(parsed);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
 
-    setState(() => _loading = false);
-    if (parsed == null) {
+      String errorMsg = 'Could not parse receipt.';
+      if (e is DioException) {
+        final serverMessage = e.response?.data?['message'];
+        errorMsg = serverMessage ?? e.message ?? e.toString();
+      } else {
+        errorMsg = e.toString();
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not parse receipt. Please verify backend keys or fill manually.'),
+        SnackBar(
+          content: Text('Error: $errorMsg'),
           backgroundColor: Colors.redAccent,
+          duration: const Duration(seconds: 12),
+          action: SnackBarAction(
+            label: 'Dismiss',
+            textColor: Colors.white,
+            onPressed: () {},
+          ),
         ),
       );
-      return;
     }
-
-    Navigator.of(context).pop(parsed);
   }
 
   @override
