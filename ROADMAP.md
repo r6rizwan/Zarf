@@ -10,18 +10,18 @@ This document outlines the product evolution, current technical accomplishments,
 gantt
     title Zarf Development Timeline & Focus Areas
     dateFormat  YYYY-MM
-    section Phase 1: Core Architecture
+    section Phase 1 - Core Architecture
     Role Separation & JWT Auth         :done, p1, 2026-01, 2026-02
     Multi-Tenant Schema Design        :done, p2, 2026-02, 2026-03
-    section Phase 2: Production Hardening
+    section Phase 2 - Production Hardening
     Llama 4 Vision Integration         :done, p3, 2026-04, 2026-05
-    Image Compression Engine          :done, p4, 2026-05, 2026-05
-    Category & VAT Auto-Extraction    :done, p5, 2026-05, 2026-05
-    Keyboard Focus Polish             :done, p6, 2026-05, 2026-05
-    section Phase 3: GCC Integrations
+    Image Compression Engine          :done, p4, 2026-05, 2026-06
+    Category & VAT Auto-Extraction    :done, p5, 2026-05, 2026-06
+    Keyboard Focus Polish             :done, p6, 2026-05, 2026-06
+    section Phase 3 - GCC Integrations
     TRN Tax Entity Validation         :active, p7, 2026-06, 2026-07
     FCM Push Notification Pipelines   :active, p8, 2026-07, 2026-08
-    section Phase 4: Future Horizon
+    section Phase 4 - Future Horizon
     Arabic RTL Localization           : p9, 2026-09, 2026-10
     Offline-First Synchronization     : p10, 2026-10, 2026-12
 ```
