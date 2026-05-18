@@ -25,19 +25,24 @@ flutter build apk --release
 APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
 if [ -f "$APK_PATH" ]; then
   echo ""
-  echo "Step 5: Copying and renaming compilation artifact..."
+  echo "Step 5: Extracting version from pubspec.yaml..."
+  VERSION=$(grep '^version: ' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
+  echo "Version detected: v$VERSION"
+
+  echo ""
+  echo "Step 6: Copying and renaming compilation artifact..."
   # Create a build_artifacts directory at the workspace root
   mkdir -p ../build_artifacts
   
   # Copy and rename the compiled APK
-  cp "$APK_PATH" "../build_artifacts/zarf.apk"
+  cp "$APK_PATH" "../build_artifacts/zarf-v$VERSION.apk"
   
   echo ""
   echo "=================================================="
   echo "✅  SUCCESS! PRODUCTION BUILD COMPLETE  ✅"
   echo "=================================================="
-  echo "Artifact created: build_artifacts/zarf.apk"
-  echo "Location: $(pwd)/../build_artifacts/zarf.apk"
+  echo "Artifact created: build_artifacts/zarf-v$VERSION.apk"
+  echo "Location: $(pwd)/../build_artifacts/zarf-v$VERSION.apk"
   echo "=================================================="
 else
   echo ""

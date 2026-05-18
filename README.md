@@ -93,12 +93,12 @@ flutter run
 ```
 
 #### Automated Production Builds (Custom APK)
-To compile a release build with a custom output name (`zarf.apk`) ready for distribution, run the automated pipeline from the root folder:
+To compile a release build with a custom versioned name (e.g., `zarf-v1.0.0.apk`) ready for distribution, run the automated pipeline from the root folder:
 ```bash
 ./build_apk.sh
 ```
 This automatically handles cache cleaning, package updates, and compiles the release binary to:
-📂 **`build_artifacts/zarf.apk`**
+📂 **`build_artifacts/zarf-v<version>.apk`**
 
 Firebase (Android):
 - Package name is `com.zarf.mobile`
