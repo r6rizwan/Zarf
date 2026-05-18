@@ -152,6 +152,7 @@ Full-stack corporate expense management app targeting UAE/GCC market.
 ---
 
 ## Deferred (Post-Portfolio)
+- Admin dashboard user provisioning & invitation flow (UI for registering new managers/employees)
 - Arabic RTL full localization
 - Multi-tenant DB isolation
 - QuickBooks / Zoho Books integration
