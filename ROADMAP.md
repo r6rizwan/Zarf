@@ -8,15 +8,15 @@ This document outlines the product evolution, current technical accomplishments,
 
 ```mermaid
 gantt
-    title Zarf Development Timeline & Focus Areas
+    title Zarf Development Timeline and Focus Areas
     dateFormat  YYYY-MM
     section Phase 1 - Core Architecture
-    Role Separation & JWT Auth         :done, p1, 2026-01, 2026-02
+    Role Separation and JWT Auth         :done, p1, 2026-01, 2026-02
     Multi-Tenant Schema Design        :done, p2, 2026-02, 2026-03
     section Phase 2 - Production Hardening
     Llama 4 Vision Integration         :done, p3, 2026-04, 2026-05
     Image Compression Engine          :done, p4, 2026-05, 2026-06
-    Category & VAT Auto-Extraction    :done, p5, 2026-05, 2026-06
+    Category and VAT Auto-Extraction    :done, p5, 2026-05, 2026-06
     Keyboard Focus Polish             :done, p6, 2026-05, 2026-06
     section Phase 3 - GCC Integrations
     TRN Tax Entity Validation         :active, p7, 2026-06, 2026-07
