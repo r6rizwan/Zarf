@@ -2,13 +2,31 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, Legend } from 'recha
 
 const COLORS = ['#0d9488', '#0369a1', '#d97706', '#7c3aed', '#dc2626', '#059669'];
 
-export default function SpendByCategoryChart({ data }) {
+export default function SpendByCategoryChart({ data, onSelectCategory }) {
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 h-80">
-      <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-4">Spend by Category</h3>
+      <div className="flex items-center justify-between gap-4 mb-4">
+        <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">Spend by Category</h3>
+        {onSelectCategory && (
+          <span className="text-xs text-slate-500">Click a slice to filter expenses</span>
+        )}
+      </div>
       <ResponsiveContainer width="100%" height="85%">
         <PieChart>
-          <Pie data={data} dataKey="total" nameKey="category" outerRadius={90} innerRadius={40} paddingAngle={2}>
+          <Pie
+            data={data}
+            dataKey="total"
+            nameKey="category"
+            outerRadius={90}
+            innerRadius={40}
+            paddingAngle={2}
+            onClick={(entry) => {
+              if (onSelectCategory && entry?.name) {
+                onSelectCategory(entry.name);
+              }
+            }}
+            cursor={onSelectCategory ? 'pointer' : 'default'}
+          >
             {data.map((entry, index) => (
               <Cell key={`${entry.category}-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}

@@ -25,6 +25,15 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
   int _totalPages = 1;
   bool _loading = false;
   String _status = '';
+  String _sortBy = 'date';
+  bool _sortAsc = false;
+
+  static const Map<String, String> _sortOptions = {
+    'date': 'Date',
+    'amount': 'Amount',
+    'status': 'Status',
+    'category': 'Category',
+  };
 
   @override
   void initState() {
@@ -48,8 +57,13 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
     setState(() => _loading = true);
     try {
       final nextPage = reset ? 1 : _page + 1;
-      final res =
-          await _repo.getExpenses(status: _status, page: nextPage, limit: 20);
+      final res = await _repo.getExpenses(
+        status: _status,
+        page: nextPage,
+        limit: 20,
+        sortBy: _sortBy,
+        sortOrder: _sortAsc ? 'asc' : 'desc',
+      );
       if (!mounted) return;
       setState(() {
         _page = res['page'];
@@ -188,128 +202,190 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
                 ],
               ),
             ),
-            Expanded(
-              child: _items.isEmpty && !_loading
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.receipt_long,
-                              size: 80,
-                              color:
-                                  AppTheme.primaryTeal.withValues(alpha: 0.3)),
-                          const SizedBox(height: 16),
-                          const Text('No expenses yet',
-                              style: TextStyle(
-                                  color: AppTheme.textSecondary, fontSize: 16)),
-                        ],
-                      ),
-                    )
-                  : ListView.separated(
-                      controller: _scroll,
-                      padding: const EdgeInsets.all(20),
-                      itemCount: _items.length + (_loading ? 1 : 0),
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (_, i) {
-                        if (i >= _items.length) {
-                          return const Center(
-                              child: Padding(
-                                  padding: EdgeInsets.all(16),
-                                  child: CircularProgressIndicator()));
-                        }
-                        final expense = _items[i];
-                        return GestureDetector(
-                          onTap: () async {
-                            await context.push('/expense/${expense.id}');
-                            _load(reset: true);
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              border: const Border(
-                                top: BorderSide(color: AppTheme.borderColor),
-                                right: BorderSide(color: AppTheme.borderColor),
-                                bottom: BorderSide(color: AppTheme.borderColor),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.02),
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 2)),
-                              ],
-                            ),
-                            child: IntrinsicHeight(
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  // Colored left border
-                                  Container(
-                                    width: 6,
-                                    decoration: BoxDecoration(
-                                      color: _getStatusColor(expense.status),
-                                      borderRadius: const BorderRadius.only(
-                                          topLeft: Radius.circular(12),
-                                          bottomLeft: Radius.circular(12)),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16),
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(expense.category,
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 16,
-                                                      color: AppTheme
-                                                          .textPrimary)),
-                                              Text(
-                                                '${expense.currency} ${NumberFormat('#,##0.00').format(expense.amount)}',
-                                                style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 16,
-                                                    color:
-                                                        AppTheme.primaryTeal),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 12),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: [
-                                              _buildStatusBadge(expense.status),
-                                              Text(
-                                                expense.date
-                                                    .toIso8601String()
-                                                    .split('T')
-                                                    .first,
-                                                style: const TextStyle(
-                                                    color:
-                                                        AppTheme.textSecondary,
-                                                    fontSize: 12),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  const Text('Sort by:',
+                      style: TextStyle(
+                          color: AppTheme.textSecondary,
+                          fontWeight: FontWeight.w600)),
+                  const SizedBox(width: 12),
+                  DropdownButton<String>(
+                    value: _sortBy,
+                    items: _sortOptions.entries
+                        .map((entry) => DropdownMenuItem(
+                              value: entry.key,
+                              child: Text(entry.value),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setState(() => _sortBy = value);
+                      _load(reset: true);
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: Icon(
+                        _sortAsc ? Icons.arrow_upward : Icons.arrow_downward),
+                    color: AppTheme.primaryTeal,
+                    onPressed: () {
+                      setState(() => _sortAsc = !_sortAsc);
+                      _load(reset: true);
+                    },
+                  ),
+                  if (_status.isNotEmpty)
+                    TextButton(
+                      onPressed: () {
+                        setState(() => _status = '');
+                        _load(reset: true);
                       },
+                      child: const Text('Clear filter'),
                     ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: _loading && _items.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : _items.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.receipt_long,
+                                  size: 80,
+                                  color: AppTheme.primaryTeal
+                                      .withValues(alpha: 0.3)),
+                              const SizedBox(height: 16),
+                              Text(
+                                _status.isEmpty
+                                    ? 'No expenses yet'
+                                    : 'No expenses match this filter',
+                                style: const TextStyle(
+                                    color: AppTheme.textSecondary,
+                                    fontSize: 16),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView.separated(
+                          controller: _scroll,
+                          padding: const EdgeInsets.all(20),
+                          itemCount: _items.length + (_loading ? 1 : 0),
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 12),
+                          itemBuilder: (_, i) {
+                            if (i >= _items.length) {
+                              return const Center(
+                                  child: Padding(
+                                      padding: EdgeInsets.all(16),
+                                      child: CircularProgressIndicator()));
+                            }
+                            final expense = _items[i];
+                            return GestureDetector(
+                              onTap: () async {
+                                await context.push('/expense/${expense.id}');
+                                _load(reset: true);
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: const Border(
+                                    top:
+                                        BorderSide(color: AppTheme.borderColor),
+                                    right:
+                                        BorderSide(color: AppTheme.borderColor),
+                                    bottom:
+                                        BorderSide(color: AppTheme.borderColor),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: Colors.black
+                                            .withValues(alpha: 0.02),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2)),
+                                  ],
+                                ),
+                                child: IntrinsicHeight(
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      // Colored left border
+                                      Container(
+                                        width: 6,
+                                        decoration: BoxDecoration(
+                                          color:
+                                              _getStatusColor(expense.status),
+                                          borderRadius: const BorderRadius.only(
+                                              topLeft: Radius.circular(12),
+                                              bottomLeft: Radius.circular(12)),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16),
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(expense.category,
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 16,
+                                                          color: AppTheme
+                                                              .textPrimary)),
+                                                  Text(
+                                                    '${expense.currency} ${NumberFormat('#,##0.00').format(expense.amount)}',
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 16,
+                                                        color: AppTheme
+                                                            .primaryTeal),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 12),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.end,
+                                                children: [
+                                                  _buildStatusBadge(
+                                                      expense.status),
+                                                  Text(
+                                                    expense.date
+                                                        .toIso8601String()
+                                                        .split('T')
+                                                        .first,
+                                                    style: const TextStyle(
+                                                        color: AppTheme
+                                                            .textSecondary,
+                                                        fontSize: 12),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
             ),
           ],
         ),

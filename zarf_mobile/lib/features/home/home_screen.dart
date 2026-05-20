@@ -181,45 +181,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Row(
                     children: [
                       Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.05),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4)),
-                            ],
-                          ),
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('My Expenses This Month',
-                                  style: TextStyle(
-                                      color: AppTheme.textSecondary,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14)),
-                              const SizedBox(height: 8),
-                              Text(
-                                '$_myMonthCount',
-                                style: const TextStyle(
-                                    color: AppTheme.primaryTeal,
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              const Text('Total count',
-                                  style: TextStyle(
-                                      color: AppTheme.textSecondary,
-                                      fontSize: 12)),
-                            ],
-                          ),
-                        ),
-                      ),
-                      if (isManager) ...[
-                        const SizedBox(width: 16),
-                        Expanded(
+                        child: GestureDetector(
+                          onTap: () => context.go('/my-expenses'),
                           child: Container(
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -235,24 +198,78 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('Pending Approvals',
+                                const Text('My Expenses This Month',
                                     style: TextStyle(
                                         color: AppTheme.textSecondary,
                                         fontWeight: FontWeight.w600,
                                         fontSize: 14)),
                                 const SizedBox(height: 8),
                                 Text(
-                                  '$_pendingApprovals',
+                                  '$_myMonthCount',
                                   style: const TextStyle(
-                                      color: AppTheme.warning,
+                                      color: AppTheme.primaryTeal,
                                       fontSize: 32,
                                       fontWeight: FontWeight.bold),
                                 ),
-                                const Text('Awaiting review',
+                                const Text('Total count',
+                                    style: TextStyle(
+                                        color: AppTheme.textSecondary,
+                                        fontSize: 12)),
+                                const SizedBox(height: 12),
+                                const Text('Tap to view details',
                                     style: TextStyle(
                                         color: AppTheme.textSecondary,
                                         fontSize: 12)),
                               ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (isManager) ...[
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => context.go('/approval'),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                      color:
+                                          Colors.black.withValues(alpha: 0.05),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4)),
+                                ],
+                              ),
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('Pending Approvals',
+                                      style: TextStyle(
+                                          color: AppTheme.textSecondary,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14)),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    '$_pendingApprovals',
+                                    style: const TextStyle(
+                                        color: AppTheme.warning,
+                                        fontSize: 32,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const Text('Awaiting review',
+                                      style: TextStyle(
+                                          color: AppTheme.textSecondary,
+                                          fontSize: 12)),
+                                  const SizedBox(height: 12),
+                                  const Text('Tap to review',
+                                      style: TextStyle(
+                                          color: AppTheme.textSecondary,
+                                          fontSize: 12)),
+                                ],
+                              ),
                             ),
                           ),
                         ),

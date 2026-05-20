@@ -10,6 +10,8 @@ class ExpenseRepo {
     String? from,
     String? to,
     String? category,
+    String? sortBy,
+    String? sortOrder,
     int page = 1,
     int limit = 20,
   }) async {
@@ -20,11 +22,14 @@ class ExpenseRepo {
       if (from != null) 'from': from,
       if (to != null) 'to': to,
       if (category != null && category.isNotEmpty) 'category': category,
+      if (sortBy != null && sortBy.isNotEmpty) 'sortBy': sortBy,
+      if (sortOrder != null && sortOrder.isNotEmpty) 'sortOrder': sortOrder,
     };
 
     final res = await api.dio.get('/expenses', queryParameters: query);
     return {
-      'data': (res.data['data'] as List).map((e) => Expense.fromJson(e)).toList(),
+      'data':
+          (res.data['data'] as List).map((e) => Expense.fromJson(e)).toList(),
       'total': res.data['total'],
       'page': res.data['page'],
       'totalPages': res.data['totalPages'],
@@ -41,7 +46,8 @@ class ExpenseRepo {
     return Expense.fromJson(res.data['data']);
   }
 
-  Future<Expense> updateStatus(String id, String status, String? reviewNote) async {
+  Future<Expense> updateStatus(
+      String id, String status, String? reviewNote) async {
     final res = await api.dio.patch('/expenses/$id/status', data: {
       'status': status,
       'reviewNote': reviewNote,

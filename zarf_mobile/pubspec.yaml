@@ -1,7 +1,7 @@
 name: zarf_mobile
 description: Zarf mobile app
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -15,6 +15,7 @@ dependencies:
   go_router: ^13.2.5
   dio: ^5.5.0+1
   flutter_secure_storage: ^9.2.2
+  http_parser: ^4.0.0
   intl: ^0.19.0
   cached_network_image: ^3.4.1
   uuid: ^4.4.2

@@ -92,107 +92,144 @@ class _ApprovalQueueScreenState extends State<ApprovalQueueScreen>
           ],
         ),
       ),
-      body: _items.isEmpty && !_loading
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+      body: RefreshIndicator(
+        onRefresh: _load,
+        child: _loading && _items.isEmpty
+            ? ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-                  Icon(Icons.check_circle_outline,
-                      size: 80,
-                      color: AppTheme.primaryTeal.withValues(alpha: 0.3)),
-                  const SizedBox(height: 16),
-                  const Text('All caught up!',
-                      style: TextStyle(
-                          color: AppTheme.textSecondary, fontSize: 16)),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height - 120,
+                    child: const Center(child: CircularProgressIndicator()),
+                  )
                 ],
-              ),
-            )
-          : ListView.separated(
-              padding: const EdgeInsets.all(20),
-              itemCount: _items.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (_, i) {
-                final e = _items[i];
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppTheme.borderColor),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.02),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2)),
-                    ],
-                  ),
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+              )
+            : _items.isEmpty
+                ? ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     children: [
-                      // Top row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(e.userName ?? 'Employee',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: AppTheme.textPrimary)),
-                          Text('${e.currency} ${NumberFormat('#,##0.00').format(e.amount)}',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: AppTheme.primaryTeal)),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      // Middle row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: AppTheme.borderColor),
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                            child: Text(e.category,
-                                style: const TextStyle(
-                                    fontSize: 10,
-                                    color: AppTheme.textSecondary,
-                                    fontWeight: FontWeight.bold)),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height - 120,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.check_circle_outline,
+                                  size: 80,
+                                  color: AppTheme.primaryTeal
+                                      .withValues(alpha: 0.3)),
+                              const SizedBox(height: 16),
+                              const Text('All caught up!',
+                                  style: TextStyle(
+                                      color: AppTheme.textSecondary,
+                                      fontSize: 16)),
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: _load,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppTheme.primaryTeal,
+                                  foregroundColor: Colors.white,
+                                ),
+                                child: const Text('Refresh'),
+                              ),
+                            ],
                           ),
-                          Text(e.date.toIso8601String().split('T').first,
-                              style: const TextStyle(
-                                  color: AppTheme.textSecondary, fontSize: 12)),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      // Bottom row
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () async {
-                            await context.push('/expense/${e.id}');
-                            _load();
-                          },
-                          style: TextButton.styleFrom(
-                            foregroundColor: AppTheme.primaryTeal,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            minimumSize: Size.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          child: const Text('Review',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
-                      ),
+                      )
                     ],
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.all(20),
+                    itemCount: _items.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemBuilder: (_, i) {
+                      final e = _items[i];
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppTheme.borderColor),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.02),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2)),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Top row
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(e.userName ?? 'Employee',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: AppTheme.textPrimary)),
+                                Text(
+                                    '${e.currency} ${NumberFormat('#,##0.00').format(e.amount)}',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: AppTheme.primaryTeal)),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            // Middle row
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: AppTheme.borderColor),
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
+                                  child: Text(e.category,
+                                      style: const TextStyle(
+                                          fontSize: 10,
+                                          color: AppTheme.textSecondary,
+                                          fontWeight: FontWeight.bold)),
+                                ),
+                                Text(e.date.toIso8601String().split('T').first,
+                                    style: const TextStyle(
+                                        color: AppTheme.textSecondary,
+                                        fontSize: 12)),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            // Bottom row
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () async {
+                                  await context.push('/expense/${e.id}');
+                                  _load();
+                                },
+                                style: TextButton.styleFrom(
+                                  foregroundColor: AppTheme.primaryTeal,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 8),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: const Text('Review',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
+      ),
     );
   }
 }

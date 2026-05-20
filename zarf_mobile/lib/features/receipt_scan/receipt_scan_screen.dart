@@ -15,6 +15,7 @@ class ReceiptScanScreen extends StatefulWidget {
 class _ReceiptScanScreenState extends State<ReceiptScanScreen> {
   final _service = ReceiptAiService();
   bool _loading = false;
+  String? _errorMessage;
 
   Future<void> _capture(ImageSource source) async {
     final picker = ImagePicker();
@@ -34,19 +35,22 @@ class _ReceiptScanScreenState extends State<ReceiptScanScreen> {
       context.pop(parsed);
     } catch (e) {
       if (!mounted) return;
-      setState(() => _loading = false);
+      setState(() {
+        _loading = false;
+        _errorMessage =
+            'Could not parse receipt. Try a clearer photo or a different image.';
+      });
 
-      String errorMsg = 'Could not parse receipt.';
       if (e is DioException) {
         final serverMessage = e.response?.data?['message'];
-        errorMsg = serverMessage ?? e.message ?? e.toString();
-      } else {
-        errorMsg = e.toString();
+        if (serverMessage != null && serverMessage.isNotEmpty) {
+          _errorMessage = serverMessage;
+        }
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error: $errorMsg'),
+          content: Text(_errorMessage!),
           backgroundColor: Colors.redAccent,
           duration: const Duration(seconds: 12),
           action: SnackBarAction(
@@ -95,6 +99,52 @@ class _ReceiptScanScreenState extends State<ReceiptScanScreen> {
               ),
             ),
             const Spacer(),
+            if (_errorMessage != null && !_loading)
+              Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.red.shade100),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.error_outline,
+                            color: Colors.redAccent),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            _errorMessage!,
+                            style: const TextStyle(color: Colors.redAccent),
+                          ),
+                        ),
+                        IconButton(
+                          icon:
+                              const Icon(Icons.close, color: Colors.redAccent),
+                          onPressed: () => setState(() => _errorMessage = null),
+                        )
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: OutlinedButton(
+                        onPressed: _loading
+                            ? null
+                            : () => _capture(ImageSource.camera),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.redAccent,
+                          side: const BorderSide(color: Colors.redAccent),
+                        ),
+                        child: const Text('Retry Scan'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             if (_loading)
               const Center(
                 child: Column(
@@ -113,7 +163,7 @@ class _ReceiptScanScreenState extends State<ReceiptScanScreen> {
               )
             else ...[
               ElevatedButton.icon(
-                onPressed: () => _capture(ImageSource.camera),
+                onPressed: _loading ? null : () => _capture(ImageSource.camera),
                 icon: const Icon(Icons.camera_alt_rounded),
                 label: const Text('Take a Photo'),
                 style: ElevatedButton.styleFrom(
@@ -127,7 +177,8 @@ class _ReceiptScanScreenState extends State<ReceiptScanScreen> {
               ),
               const SizedBox(height: 14),
               OutlinedButton.icon(
-                onPressed: () => _capture(ImageSource.gallery),
+                onPressed:
+                    _loading ? null : () => _capture(ImageSource.gallery),
                 icon: const Icon(Icons.photo_library_rounded),
                 label: const Text('Upload from Gallery'),
                 style: OutlinedButton.styleFrom(

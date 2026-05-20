@@ -36,17 +36,50 @@ export const getExpenses = async (req, res, next) => {
     if (from || to) {
       query.date = {};
       if (from) query.date.$gte = new Date(from);
-      if (to) query.date.$lte = new Date(to);
+      if (to) {
+        const [year, month, day] = to.split('-').map(Number);
+        const endOfDay = new Date(year, month - 1, day, 23, 59, 59, 999);
+        query.date.$lte = endOfDay;
+      }
     }
 
     const parsedPage = Number(page);
     const parsedLimit = Number(limit);
     const skip = (parsedPage - 1) * parsedLimit;
 
+    const sortBy = req.query.sortBy || 'date';
+    const sortOrderParam = req.query.sortOrder === 'asc' ? 1 : -1;
+    const sortFieldMap = {
+      employee: 'userId',
+      merchant: 'notes',
+      amount: 'amountBase',
+      vat: 'vatAmount',
+      category: 'category',
+      date: 'date',
+      status: 'status'
+    };
+
+    if (!Object.keys(sortFieldMap).includes(sortBy)) {
+      throw new ValidationError('sortBy must be one of employee, merchant, amount, vat, category, date, status');
+    }
+
+    const sortField = sortFieldMap[sortBy];
+
+    if (from && to) {
+      const fromDate = new Date(from);
+      const toDate = new Date(to);
+      if (Number.isNaN(fromDate.getTime()) || Number.isNaN(toDate.getTime())) {
+        throw new ValidationError('Invalid from/to date');
+      }
+      if (fromDate > toDate) {
+        throw new ValidationError('from date cannot be after to date');
+      }
+    }
+
     const [data, total] = await Promise.all([
       Expense.find(query)
         .populate('userId', 'name email')
-        .sort({ createdAt: -1 })
+        .sort({ [sortField]: sortOrderParam })
         .skip(skip)
         .limit(parsedLimit),
       Expense.countDocuments(query)
@@ -79,6 +112,20 @@ export const createExpense = async (req, res, next) => {
 
     if (!amount || !currency || !category || !date) {
       throw new ValidationError('amount, currency, category and date are required');
+    }
+
+    const parsedAmount = Number(amount);
+    if (Number.isNaN(parsedAmount) || parsedAmount <= 0) {
+      throw new ValidationError('amount must be a positive number');
+    }
+
+    if (typeof currency !== 'string' || currency.trim().length !== 3) {
+      throw new ValidationError('currency must be a valid 3-letter code');
+    }
+
+    const expenseDate = new Date(date);
+    if (Number.isNaN(expenseDate.getTime())) {
+      throw new ValidationError('date must be a valid date');
     }
 
     const company = await Company.findById(req.user.companyId).select('baseCurrency');

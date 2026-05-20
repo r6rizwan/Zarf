@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQueries } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import StatCard from '../components/shared/StatCard';
 import SpendByCategoryChart from '../components/charts/SpendByCategoryChart';
@@ -36,10 +37,19 @@ export default function DashboardPage() {
     ]
   });
 
+  const isSummaryLoading = summaryQuery.isFetching && !summaryQuery.data;
+  const isCategoryLoading = categoryQuery.isFetching && !categoryQuery.data;
+  const isVatLoading = vatQuery.isFetching && !vatQuery.data;
+  const categoryData = categoryQuery.data || [];
+  const navigate = useNavigate();
   const last6Months = rollingMonths.map((item, idx) => ({
     label: item.label,
     total: monthlyQueries[idx]?.data?.approvedTotal ?? 0
   }));
+
+  const handleCategorySelect = (category) => {
+    navigate(`/expenses?category=${encodeURIComponent(category)}`);
+  };
 
   return (
     <div className="space-y-6">
@@ -61,20 +71,36 @@ export default function DashboardPage() {
 
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total Spend" value={summaryQuery.data?.totalSpend ?? 0} />
-        <StatCard label="Pending Approvals" value={summaryQuery.data?.pendingCount ?? 0} />
-        <StatCard label="Approved Total" value={summaryQuery.data?.approvedTotal ?? 0} />
-        <StatCard label="Total VAT" value={summaryQuery.data?.totalVAT ?? 0} />
+        <StatCard label="Total Spend" value={isSummaryLoading ? 'Loading...' : summaryQuery.data?.totalSpend ?? 0} />
+        <StatCard label="Pending Approvals" value={isSummaryLoading ? 'Loading...' : summaryQuery.data?.pendingCount ?? 0} />
+        <StatCard label="Approved Total" value={isSummaryLoading ? 'Loading...' : summaryQuery.data?.approvedTotal ?? 0} />
+        <StatCard label="Total VAT" value={isSummaryLoading ? 'Loading...' : summaryQuery.data?.totalVAT ?? 0} />
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <MonthlySpendChart data={last6Months} />
-        <SpendByCategoryChart data={categoryQuery.data || []} />
+        {isCategoryLoading ? (
+          <div className="bg-white rounded-xl shadow-sm p-6 h-80 flex items-center justify-center text-sm text-slate-500">
+            Loading category spend…
+          </div>
+        ) : categoryData.length === 0 ? (
+          <div className="bg-white rounded-xl shadow-sm p-6 h-80 flex items-center justify-center text-sm text-slate-500">
+            No category spend data for this period.
+          </div>
+        ) : (
+          <SpendByCategoryChart data={categoryData} onSelectCategory={handleCategorySelect} />
+        )}
       </div>
 
       {/* VAT */}
-      <VATSummaryCard report={vatQuery.data} />
+      {isVatLoading ? (
+        <div className="bg-white rounded-xl shadow-sm p-6 flex items-center justify-center text-sm text-slate-500">
+          Loading VAT summary…
+        </div>
+      ) : (
+        <VATSummaryCard report={vatQuery.data} />
+      )}
     </div>
   );
 }

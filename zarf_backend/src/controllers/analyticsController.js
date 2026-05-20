@@ -87,26 +87,22 @@ export const getByEmployee = async (req, res, next) => {
           _id: '$userId',
           total: { $sum: { $ifNull: ['$amountBase', 0] } }
         }
-      },
-      { $sort: { total: -1 } }
+      }
     ]);
 
-    const userIds = totals.map((t) => t._id);
-    const users = await User.find({ _id: { $in: userIds } })
-      .select('name email role')
+    const totalsMap = new Map(totals.map((t) => [t._id.toString(), t.total]));
+    const employees = await User.find({ companyId: req.user.companyId, role: 'employee' })
+      .select('name email')
       .lean();
-    const userMap = new Map(users.map((u) => [u._id.toString(), u]));
 
-    const data = totals.map((t) => {
-      const u = userMap.get(t._id.toString());
-      return {
-        userId: t._id,
-        name: u?.name || 'Unknown',
-        email: u?.email || null,
-        role: u?.role || null,
-        total: t.total
-      };
-    });
+    const data = employees
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((employee) => ({
+        userId: employee._id,
+        name: employee.name,
+        email: employee.email,
+        total: totalsMap.get(employee._id.toString()) || 0
+      }));
 
     res.json({ success: true, data });
   } catch (err) {

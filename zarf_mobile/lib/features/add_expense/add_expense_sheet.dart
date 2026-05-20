@@ -149,6 +149,22 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
     super.dispose();
   }
 
+  Widget _buildAiTag(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE0F2F1),
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: const Color(0xFF26A69A)),
+      ),
+      child: Text(label,
+          style: const TextStyle(
+              color: Color(0xFF0D9488),
+              fontWeight: FontWeight.w600,
+              fontSize: 12)),
+    );
+  }
+
   InputDecoration _decor(String label, {bool aiFilled = false}) {
     return InputDecoration(
       labelText: label,
@@ -190,6 +206,19 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                 label: const Text('Scan Receipt'),
               ),
             ),
+            if (_aiCurrency || _aiDate || _aiNotes)
+              Padding(
+                padding: const EdgeInsets.only(top: 16, bottom: 16),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    if (_aiCurrency) _buildAiTag('Currency auto-filled'),
+                    if (_aiDate) _buildAiTag('Date auto-filled'),
+                    if (_aiNotes) _buildAiTag('Merchant auto-filled'),
+                  ],
+                ),
+              ),
             const SizedBox(height: 32),
             TextField(
               controller: _amount,
