@@ -83,34 +83,44 @@ export default function ExpensesPage() {
     const list = [...data];
     const direction = sortOrder === 'asc' ? 1 : -1;
 
-    return list.sort((a, b) => {
-      const getValue = (item) => {
-        switch (sortKey) {
-          case 'employee':
-            return item.userId?.name || item.userName || '';
-          case 'merchant':
-            return item.notes || '';
-          case 'amount':
-            return Number(item.amountBase ?? item.amount ?? 0);
-          case 'vat':
-            return Number(item.vatAmount ?? 0);
-          case 'category':
-            return item.category || '';
-          case 'date':
-            return new Date(item.date || 0).getTime();
-          case 'status':
-            return item.status || '';
-          default:
-            return item.userId?.name || item.userName || '';
-        }
-      };
+    const getValue = (item) => {
+      switch (sortKey) {
+        case 'employee':
+          return item.userId?.name || item.userName || '';
 
+        case 'merchant':
+          return item.notes || '';
+
+        case 'amount':
+          return Number(item.amountBase ?? item.amount ?? 0);
+
+        case 'vat':
+          return Number(item.vatAmount ?? 0);
+
+        case 'category':
+          return item.category || '';
+
+        case 'date':
+          return item.date ? new Date(item.date).getTime() : 0;
+
+        case 'status':
+          return item.status || '';
+
+        default:
+          return '';
+      }
+    };
+
+    return list.sort((a, b) => {
       const valueA = getValue(a);
       const valueB = getValue(b);
 
+      // Number + Date sorting
       if (typeof valueA === 'number' && typeof valueB === 'number') {
         return (valueA - valueB) * direction;
       }
+
+      // String sorting
       return String(valueA).localeCompare(String(valueB)) * direction;
     });
   }, [data, sortKey, sortOrder]);
