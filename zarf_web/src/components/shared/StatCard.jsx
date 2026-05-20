@@ -36,7 +36,13 @@ const cardConfig = {
 export default function StatCard({ label, value }) {
   const config = cardConfig[label] || cardConfig['Total Spend'];
   const Icon = config.icon;
-  const displayValue = config.isCurrency ? formatAmount(value, 'AED') : value;
+
+  // Avoid passing non-numeric values into currency formatter which yields "NaN".
+  const displayValueRaw = config.isCurrency
+    ? (typeof value === 'number' ? formatAmount(value, 'AED') : value)
+    : value;
+
+  const isLoading = displayValueRaw === 'Loading...';
 
   return (
     <div className={`bg-white rounded-xl shadow-sm p-5 border-b-2 ${config.borderColor}`}>
@@ -46,7 +52,19 @@ export default function StatCard({ label, value }) {
           <Icon className={`w-5 h-5 ${config.iconColor}`} />
         </div>
       </div>
-      <p className="text-2xl font-bold text-slate-800">{displayValue}</p>
+      <p className="text-2xl font-bold text-slate-800">
+        {isLoading ? (
+          <span className="inline-flex items-center">
+            <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-slate-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+            </svg>
+            Loading...
+          </span>
+        ) : (
+          displayValueRaw
+        )}
+      </p>
       {config.subtitle && <p className="text-xs text-slate-400 mt-0.5">{config.subtitle}</p>}
     </div>
   );
