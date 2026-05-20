@@ -47,5 +47,3 @@ Whether you are located in the European Union (GDPR) or the United Arab Emirates
 *   **Right to Access:** You can request a summary of all expenses and account data associated with your user ID.
 *   **Right to Deletion:** You can request that your account be deleted.
 *   **Right to Rectification:** You can update or correct your profile details at any time.
-
-*For any inquiries regarding data processing, please contact your company's Zarf Workspace Administrator.*
