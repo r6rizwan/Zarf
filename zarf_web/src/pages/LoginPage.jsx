@@ -46,7 +46,7 @@ export default function LoginPage() {
             </div>
             <h1 className="text-5xl font-bold text-white tracking-tight">Zarf</h1>
           </div>
-          <p className="text-slate-400 text-lg">Expense management built for the GCC</p>
+          <p className="text-slate-400 text-lg">Smart expense management for modern teams</p>
         </div>
       </div>
 
