@@ -30,6 +30,10 @@ app.use(
 app.use(express.json());
 app.use(generalLimiter);
 
+app.get('/api/v1/health', (req, res) => {
+  res.json({ success: true, uptime: process.uptime() });
+});
+
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/expenses', expenseRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);

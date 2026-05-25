@@ -23,4 +23,10 @@ const expenseSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+expenseSchema.index({ companyId: 1, createdAt: -1 });
+expenseSchema.index({ companyId: 1, userId: 1, createdAt: -1 });
+expenseSchema.index({ companyId: 1, status: 1, createdAt: -1 });
+expenseSchema.index({ companyId: 1, category: 1, createdAt: -1 });
+expenseSchema.index({ companyId: 1, date: -1 });
+
 export default mongoose.model('Expense', expenseSchema);
