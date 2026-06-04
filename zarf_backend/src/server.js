@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression';
 import env from './config/env.js';
 import { connectDB } from './config/db.js';
 import authRoutes from './routes/auth.routes.js';
@@ -28,6 +29,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use(compression());
 app.use(generalLimiter);
 
 app.get('/api/v1/health', (req, res) => {

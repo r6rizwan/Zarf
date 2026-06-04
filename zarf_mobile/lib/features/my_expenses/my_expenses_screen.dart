@@ -47,7 +47,7 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
         _load();
       }
     });
-    _pollTimer = Timer.periodic(const Duration(seconds: 12), (_) {
+    _pollTimer = Timer.periodic(const Duration(seconds: 45), (_) {
       _load(reset: true);
     });
   }

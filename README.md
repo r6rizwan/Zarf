@@ -27,8 +27,10 @@
 - **Multi-Parameter Extraction:** Automatically extracts and populates Merchant, Amount, Currency, Date, **Category classification**, and **VAT/Tax details** directly from photo assets.
 - **Smart VAT Toggling:** Instantly detects if tax was charged, flips the VAT switch to ON in the UI, and fills the exact tax amount.
 - **Image Compression Engine:** Scaler on mobile compressing raw photos to 1024x1024 / 85% quality, reducing network transfer payloads from 12MB down to ~150KB.
+- **Free-Tier Performance Optimizations:** Health-check keep-alive pinging, compressed API responses, lean Mongo reads, trimmed expense-list payloads, and in-memory mobile caching to reduce Render cold-start pain.
 - **Premium UX Polish:** Smooth soft-keyboard dismissals via active focus releases on login and submission sheets.
 - **Manager Queues:** Real-time review lanes to Approve or Reject transactions with custom comments.
+- **Push Notifications:** Instant FCM push alerts delivered to employee devices when a manager approves or rejects their expense claim.
 - **VAT-Aware Architecture:** Fully configurable VAT rates (UAE 5%, Saudi 15%, etc.) with live AED currency conversion.
 
 [Explore the full Product Roadmap & Completed Milestones here!](ROADMAP.md)
@@ -145,3 +147,6 @@ Recruiters and reviewers can use the following pre-seeded test accounts to explo
 - Arabic RTL localization is in the roadmap
 - Mobile expense lists auto-refresh (polling + app resume + return from detail)
 - Nested stateful navigation (StatefulShellRoute tab caching) preventing redundant API re-fetching and preserving UI scroll positions
+- Mobile networking uses in-memory auth token caching, short-lived list caching, and GET retry/backoff for unstable connections
+- Home screen prioritizes fast first paint by rendering recent expenses first and loading manager-only approval counts after
+- Backend includes `/api/v1/health`, response compression, lean read queries, and smaller expense-list payloads for better free-tier performance

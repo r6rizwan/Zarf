@@ -27,17 +27,18 @@ class _ApprovalQueueScreenState extends State<ApprovalQueueScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _load();
-    _pollTimer = Timer.periodic(const Duration(seconds: 12), (_) {
+    _pollTimer = Timer.periodic(const Duration(seconds: 45), (_) {
       _load();
     });
   }
 
   Future<void> _load() async {
+    if (_loading) return;
     if (!mounted) return;
     setState(() => _loading = true);
     try {
       final res =
-          await _repo.getExpenses(status: 'pending', page: 1, limit: 20);
+          await _repo.getExpenses(status: 'pending', page: 1, limit: 10, useCache: false);
       if (!mounted) return;
       setState(() => _items = (res['data'] as List<Expense>));
     } catch (e) {

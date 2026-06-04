@@ -31,8 +31,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _load() async {
     try {
-      final user = await ApiService.instance.getCurrentUser();
-      final myExpensesRes = await _repo.getExpenses(page: 1, limit: 5);
+      final userFuture = ApiService.instance.getCurrentUser();
+      final myExpensesFuture = _repo.getExpenses(page: 1, limit: 5);
+
+      final results = await Future.wait([userFuture, myExpensesFuture]);
+      final user = results[0] as User?;
+      final myExpensesRes = results[1] as Map<String, dynamic>;
       final myExpenses = (myExpensesRes['data'] as List<Expense>);
 
       var monthCount = 0;
@@ -43,20 +47,23 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       }
 
-      int pendingApprovals = 0;
-      if (user?.role == 'manager' || user?.role == 'admin') {
-        final pendingRes =
-            await _repo.getExpenses(status: 'pending', page: 1, limit: 20);
-        pendingApprovals = pendingRes['total'] as int;
-      }
-
       if (!mounted) return;
       setState(() {
         _user = user;
         _recent = myExpenses;
         _myMonthCount = monthCount;
-        _pendingApprovals = pendingApprovals;
+        _pendingApprovals = 0;
+        _loading = false;
       });
+
+      if (user?.role == 'manager' || user?.role == 'admin') {
+        final pendingRes =
+            await _repo.getExpenses(status: 'pending', page: 1, limit: 20);
+        if (!mounted) return;
+        setState(() {
+          _pendingApprovals = pendingRes['total'] as int;
+        });
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -66,12 +73,74 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       }
     } finally {
-      if (mounted) {
+      if (mounted && _loading) {
         setState(() {
           _loading = false;
         });
       }
     }
+  }
+
+  Widget _buildHomeSkeleton() {
+    Widget block({double h = 16, double? w}) => Container(
+          height: h,
+          width: w,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade300,
+            borderRadius: BorderRadius.circular(8),
+          ),
+        );
+
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 60),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            block(h: 28, w: 220),
+            const SizedBox(height: 10),
+            block(h: 14, w: 140),
+            const SizedBox(height: 22),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade200,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Container(
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade200,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 28),
+            block(h: 14, w: 160),
+            const SizedBox(height: 12),
+            for (int i = 0; i < 3; i++) ...[
+              Container(
+                height: 72,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildStatusBadge(String status) {
@@ -120,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return _buildHomeSkeleton();
     }
 
     final isManager = _user?.role == 'manager' || _user?.role == 'admin';
@@ -166,6 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.7), fontSize: 14),
                 ),
+                const SizedBox(height: 4),
               ],
             ),
           ),

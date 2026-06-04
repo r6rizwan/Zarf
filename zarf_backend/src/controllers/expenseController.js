@@ -78,10 +78,14 @@ export const getExpenses = async (req, res, next) => {
 
     const [data, total] = await Promise.all([
       Expense.find(query)
+        .select(
+          'userId companyId amount currency amountBase category notes receiptUrl vatApplicable vatAmount paymentMethod status reviewedBy reviewNote date createdAt'
+        )
         .populate('userId', 'name email')
         .sort({ [sortField]: sortOrderParam })
         .skip(skip)
-        .limit(parsedLimit),
+        .limit(parsedLimit)
+        .lean(),
       Expense.countDocuments(query)
     ]);
 
@@ -164,7 +168,7 @@ export const createExpense = async (req, res, next) => {
 
 export const getExpenseById = async (req, res, next) => {
   try {
-    const expense = await Expense.findById(req.params.id);
+    const expense = await Expense.findById(req.params.id).lean();
     if (!expense) throw new NotFoundError('Expense not found');
 
     if (

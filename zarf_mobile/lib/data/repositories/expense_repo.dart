@@ -4,6 +4,8 @@ import '../services/api_service.dart';
 
 class ExpenseRepo {
   final api = ApiService.instance;
+  final Map<String, ({DateTime ts, Map<String, dynamic> data})> _cache = {};
+  static const _cacheTtl = Duration(seconds: 45);
 
   Future<Map<String, dynamic>> getExpenses({
     String? status,
@@ -14,6 +16,7 @@ class ExpenseRepo {
     String? sortOrder,
     int page = 1,
     int limit = 20,
+    bool useCache = true,
   }) async {
     final query = {
       'page': page,
@@ -26,14 +29,24 @@ class ExpenseRepo {
       if (sortOrder != null && sortOrder.isNotEmpty) 'sortOrder': sortOrder,
     };
 
+    final cacheKey = query.toString();
+    final cached = _cache[cacheKey];
+    if (useCache &&
+        cached != null &&
+        DateTime.now().difference(cached.ts) < _cacheTtl) {
+      return cached.data;
+    }
+
     final res = await api.dio.get('/expenses', queryParameters: query);
-    return {
+    final parsed = {
       'data':
           (res.data['data'] as List).map((e) => Expense.fromJson(e)).toList(),
       'total': res.data['total'],
       'page': res.data['page'],
       'totalPages': res.data['totalPages'],
     };
+    _cache[cacheKey] = (ts: DateTime.now(), data: parsed);
+    return parsed;
   }
 
   Future<Expense> createExpense(ExpenseCreateDto dto) async {

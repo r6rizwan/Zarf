@@ -19,9 +19,24 @@ class ApiService {
   static const _userKey = 'currentUser';
 
   final FlutterSecureStorage storage = const FlutterSecureStorage();
-  late final Dio dio = Dio(BaseOptions(baseUrl: _baseUrl));
+  late final Dio dio = Dio(
+    BaseOptions(
+      baseUrl: _baseUrl,
+      connectTimeout: const Duration(seconds: 8),
+      receiveTimeout: const Duration(seconds: 20),
+      sendTimeout: const Duration(seconds: 20),
+    ),
+  );
   GoRouter? router;
   bool _isRefreshing = false;
+  String? _accessTokenCache;
+  String? _refreshTokenCache;
+
+  bool _shouldRetryGet(DioException error) {
+    final status = error.response?.statusCode;
+    return error.requestOptions.method.toUpperCase() == 'GET' &&
+        (status == null || status >= 500);
+  }
 
   void init({GoRouter? appRouter}) {
     router = appRouter;
@@ -29,7 +44,11 @@ class ApiService {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final token = await storage.read(key: _accessTokenKey);
+          var token = _accessTokenCache;
+          if (token == null || token.isEmpty) {
+            token = await storage.read(key: _accessTokenKey);
+            _accessTokenCache = token;
+          }
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
           }
@@ -42,7 +61,7 @@ class ApiService {
             _isRefreshing = false;
 
             if (ok) {
-              final token = await storage.read(key: _accessTokenKey);
+              final token = _accessTokenCache;
               final req = error.requestOptions;
               req.headers['Authorization'] = 'Bearer $token';
               final retry = await dio.fetch(req);
@@ -52,6 +71,19 @@ class ApiService {
             await clearTokens();
             router?.go('/login');
           }
+
+          if (_shouldRetryGet(error)) {
+            final retryCount = (error.requestOptions.extra['retryCount'] ?? 0) as int;
+            if (retryCount < 2) {
+              error.requestOptions.extra['retryCount'] = retryCount + 1;
+              final delayMs = retryCount == 0 ? 300 : 900;
+              await Future.delayed(Duration(milliseconds: delayMs));
+              try {
+                final retry = await dio.fetch(error.requestOptions);
+                return handler.resolve(retry);
+              } catch (_) {}
+            }
+          }
           handler.next(error);
         },
       ),
@@ -60,7 +92,11 @@ class ApiService {
 
   Future<bool> _refreshToken() async {
     try {
-      final refreshToken = await storage.read(key: _refreshTokenKey);
+      var refreshToken = _refreshTokenCache;
+      if (refreshToken == null || refreshToken.isEmpty) {
+        refreshToken = await storage.read(key: _refreshTokenKey);
+        _refreshTokenCache = refreshToken;
+      }
       if (refreshToken == null) return false;
 
       final tempDio = Dio(BaseOptions(baseUrl: _baseUrl));
@@ -81,6 +117,8 @@ class ApiService {
 
   Future<void> saveTokens(
       {required String accessToken, required String refreshToken}) async {
+    _accessTokenCache = accessToken;
+    _refreshTokenCache = refreshToken;
     await storage.write(key: _accessTokenKey, value: accessToken);
     await storage.write(key: _refreshTokenKey, value: refreshToken);
   }
@@ -97,6 +135,8 @@ class ApiService {
   }
 
   Future<void> clearTokens() async {
+    _accessTokenCache = null;
+    _refreshTokenCache = null;
     await storage.delete(key: _accessTokenKey);
     await storage.delete(key: _refreshTokenKey);
     await storage.delete(key: _userKey);
