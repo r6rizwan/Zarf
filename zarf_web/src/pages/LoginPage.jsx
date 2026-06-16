@@ -1,17 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import { useAuthStore } from '../store/authStore';
-import { Wallet } from 'lucide-react';
+import { Wallet, Loader2, WifiOff } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [serverStatus, setServerStatus] = useState('checking'); // 'checking', 'waking', 'connected', 'error'
   const navigate = useNavigate();
   const location = useLocation();
   const setAuth = useAuthStore((s) => s.setAuth);
+
+  useEffect(() => {
+    let active = true;
+    const wakeTimer = setTimeout(() => {
+      if (active) {
+        setServerStatus((prev) => (prev === 'checking' ? 'waking' : prev));
+      }
+    }, 1500);
+
+    axiosClient
+      .get('/health')
+      .then(() => {
+        if (active) {
+          clearTimeout(wakeTimer);
+          setServerStatus('connected');
+        }
+      })
+      .catch((err) => {
+        console.error('Health check failed', err);
+        if (active) {
+          clearTimeout(wakeTimer);
+          setServerStatus('error');
+        }
+      });
+
+    return () => {
+      active = false;
+      clearTimeout(wakeTimer);
+    };
+  }, []);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -67,6 +98,18 @@ export default function LoginPage() {
           {location.state?.message && (
             <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-4">
               <p className="text-amber-700 text-sm">{location.state.message}</p>
+            </div>
+          )}
+
+          {serverStatus === 'waking' && (
+            <div className="bg-sky-50 border border-sky-200 rounded-lg px-4 py-3 mb-4 flex items-start gap-3">
+              <Loader2 className="w-5 h-5 text-sky-600 animate-spin shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sky-800 text-sm font-medium">Waking up server...</p>
+                <p className="text-sky-600 text-xs mt-0.5 leading-relaxed">
+                  The API is hosted on Render's free tier and is currently sleeping. Waking it up may take up to 60 seconds. Thank you for your patience!
+                </p>
+              </div>
             </div>
           )}
 
