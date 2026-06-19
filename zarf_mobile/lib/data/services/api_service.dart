@@ -22,7 +22,7 @@ class ApiService {
   late final Dio dio = Dio(
     BaseOptions(
       baseUrl: _baseUrl,
-      connectTimeout: const Duration(seconds: 8),
+      connectTimeout: const Duration(seconds: 60),
       receiveTimeout: const Duration(seconds: 20),
       sendTimeout: const Duration(seconds: 20),
     ),

@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../data/repositories/auth_repo.dart';
+import '../../data/services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,6 +19,43 @@ class _LoginScreenState extends State<LoginScreen> {
   final _repo = AuthRepo();
   bool _loading = false;
   String? _error;
+  bool _serverWaking = false;
+  Timer? _wakeTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkServerHealth();
+  }
+
+  @override
+  void dispose() {
+    _wakeTimer?.cancel();
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
+  }
+
+  void _checkServerHealth() {
+    _wakeTimer = Timer(const Duration(milliseconds: 1500), () {
+      if (mounted) {
+        setState(() {
+          _serverWaking = true;
+        });
+      }
+    });
+
+    ApiService.instance.dio.get('/health').then((_) {
+      _wakeTimer?.cancel();
+      if (mounted) {
+        setState(() {
+          _serverWaking = false;
+        });
+      }
+    }).catchError((e) {
+      _wakeTimer?.cancel();
+    });
+  }
 
   Future<void> _submit() async {
     FocusScope.of(context).unfocus(); // Dismiss soft keyboard and clear active focus
@@ -86,6 +125,53 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: Theme.of(context).textTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),
+              if (_serverWaking) ...[
+                const SizedBox(height: 24),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.blue.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue.shade600),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Waking up server...',
+                              style: TextStyle(
+                                color: Colors.blue.shade900,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'The backend API is sleeping on Render\'s free tier. Spin-up may take up to 60 seconds.',
+                              style: TextStyle(
+                                color: Colors.blue.shade700,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               const SizedBox(height: 48),
               TextField(
                 controller: _email,

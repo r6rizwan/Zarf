@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -10,6 +11,13 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   ApiService.instance.init(appRouter: AppRouter.router);
+
+  // Wake up the backend server immediately on application startup
+  ApiService.instance.dio.get('/health').catchError((e) {
+    debugPrint('Startup server wake-up ping failed: $e');
+    return Response(requestOptions: RequestOptions(path: '/health'));
+  });
+
   await NotificationService.instance.init();
   runApp(const ZarfApp());
 }

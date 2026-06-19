@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import DashboardPage from './pages/DashboardPage';
 import EmployeesPage from './pages/EmployeesPage';
@@ -8,6 +9,7 @@ import ProtectedRoute from './components/shared/ProtectedRoute';
 import Sidebar from './components/layout/Sidebar';
 import TopBar from './components/layout/TopBar';
 import { useAuthStore } from './store/authStore';
+import axiosClient from './api/axiosClient';
 
 function AppLayout({ title, children }) {
   return (
@@ -23,6 +25,13 @@ function AppLayout({ title, children }) {
 
 export default function App() {
   const { isAuthenticated } = useAuthStore();
+
+  useEffect(() => {
+    // Wake up the server immediately on application load
+    axiosClient.get('/health').catch((err) => {
+      console.warn('Startup server wake-up ping failed:', err);
+    });
+  }, []);
 
   return (
     <Routes>
