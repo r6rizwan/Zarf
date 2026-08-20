@@ -50,8 +50,12 @@ Zarf is structured with a strict, multi-tenant B2B separation of concerns across
 
 ### Mobile App
 <p align="center">
-  <img src="screenshots/mobile_01.jpeg" width="230" />
-  <img src="screenshots/mobile_02.jpeg" width="230" />
+  <img src="screenshots/mobile_01.jpeg" width="700" />
+  
+</p>
+
+<p align="center">
+  <img src="screenshots/mobile_02.jpeg" width="700" />
 </p>
 
 ### Web Dashboard
