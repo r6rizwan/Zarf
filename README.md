@@ -46,6 +46,24 @@ Zarf is structured with a strict, multi-tenant B2B separation of concerns across
     *   **Managers:** Audit expenses in a tabular spreadsheet, perform reviews, and export CSVs.
     *   **Admins:** Have unrestricted access, including the employee spending directory and core settings (VAT rate adjustments, base currency changes, TRN settings).
 
+## Screenshots
+
+### Mobile App
+<p align="center">
+  <img src="screenshots/mobile_01.jpeg" width="230" />
+  <img src="screenshots/mobile_02.jpeg" width="230" />
+</p>
+
+### Web Dashboard
+<p align="center">
+  <img src="screenshots/Admin_dashboard.jpeg" width="700" />
+</p>
+<p align="center">
+  <img src="screenshots/Expenses.jpeg" width="340" />
+  <img src="screenshots/Employees.jpeg" width="340" />
+  <img src="screenshots/VAT_settings.jpeg" width="340" />
+</p>
+
 ## Tech Stack
 | Layer | Tech |
 |-------|------|
