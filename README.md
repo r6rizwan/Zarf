@@ -53,7 +53,6 @@ Zarf is structured with a strict, multi-tenant B2B separation of concerns across
   <img src="screenshots/mobile_01.jpeg" width="700" />
   
 </p>
-
 <p align="center">
   <img src="screenshots/mobile_02.jpeg" width="700" />
 </p>
@@ -63,9 +62,13 @@ Zarf is structured with a strict, multi-tenant B2B separation of concerns across
   <img src="screenshots/Admin_dashboard.jpeg" width="700" />
 </p>
 <p align="center">
-  <img src="screenshots/Expenses.jpeg" width="340" />
-  <img src="screenshots/Employees.jpeg" width="340" />
-  <img src="screenshots/VAT_settings.jpeg" width="340" />
+  <img src="screenshots/Expenses.jpeg" width="700" />
+</p>
+<p align="center">
+  <img src="screenshots/Employees.jpeg" width="700" />
+</p>
+<p align="center">
+  <img src="screenshots/VAT_settings.jpeg" width="700" />
 </p>
 
 ## Tech Stack
