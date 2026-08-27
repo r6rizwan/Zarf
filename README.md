@@ -48,51 +48,43 @@ Zarf is structured with a strict, multi-tenant B2B separation of concerns across
 
 ## Screenshots
 
-<p align="center">
-  <img src="screenshots/mobile_01.jpeg" width="320" alt="Zarf mobile home dashboard" />
-</p>
+### Mobile Experience
+<table>
+  <tr>
+    <td align="center">
+      <img src="screenshots/mobile_01.jpeg" width="320" alt="Zarf mobile home dashboard" /><br/>
+      <sub>Home dashboard</sub>
+    </td>
+    <td align="center">
+      <img src="screenshots/mobile_02.jpeg" width="320" alt="Zarf mobile expense workflow" /><br/>
+      <sub>Expense workflow</sub>
+    </td>
+  </tr>
+</table>
 
-<details>
-  <summary>More screenshots</summary>
-
-  <h3>Mobile App</h3>
-  <table>
-    <tr>
-      <td align="center">
-        <img src="screenshots/mobile_01.jpeg" width="320" alt="Zarf mobile home dashboard" /><br/>
-        <sub>Home dashboard</sub>
-      </td>
-      <td align="center">
-        <img src="screenshots/mobile_02.jpeg" width="320" alt="Zarf mobile expense workflow" /><br/>
-        <sub>Expense workflow</sub>
-      </td>
-    </tr>
-  </table>
-
-  <h3>Web Dashboard</h3>
-  <table>
-    <tr>
-      <td align="center">
-        <img src="screenshots/Admin_dashboard.jpeg" width="320" alt="Zarf admin dashboard" /><br/>
-        <sub>Admin dashboard</sub>
-      </td>
-      <td align="center">
-        <img src="screenshots/Expenses.jpeg" width="320" alt="Zarf expenses management page" /><br/>
-        <sub>Expenses management</sub>
-      </td>
-    </tr>
-    <tr>
-      <td align="center">
-        <img src="screenshots/Employees.jpeg" width="320" alt="Zarf employees analytics page" /><br/>
-        <sub>Employee analytics</sub>
-      </td>
-      <td align="center">
-        <img src="screenshots/VAT_settings.jpeg" width="320" alt="Zarf VAT settings page" /><br/>
-        <sub>VAT settings</sub>
-      </td>
-    </tr>
-  </table>
-</details>
+### Web Dashboard
+<table>
+  <tr>
+    <td align="center">
+      <img src="screenshots/Admin_dashboard.jpeg" width="320" alt="Zarf admin dashboard" /><br/>
+      <sub>Admin dashboard</sub>
+    </td>
+    <td align="center">
+      <img src="screenshots/Expenses.jpeg" width="320" alt="Zarf expenses management page" /><br/>
+      <sub>Expenses management</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="screenshots/Employees.jpeg" width="320" alt="Zarf employees analytics page" /><br/>
+      <sub>Employee analytics</sub>
+    </td>
+    <td align="center">
+      <img src="screenshots/VAT_settings.jpeg" width="320" alt="Zarf VAT settings page" /><br/>
+      <sub>VAT settings</sub>
+    </td>
+  </tr>
+</table>
 
 ## Tech Stack
 | Layer | Tech |
