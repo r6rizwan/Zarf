@@ -202,7 +202,7 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
                   _buildStatusBadge(e.status),
                   const SizedBox(height: 16),
                   Text(
-                    'AED ${e.amount.toStringAsFixed(2)}',
+                    '${e.currency} ${e.amount.toStringAsFixed(2)}',
                     style: const TextStyle(
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
@@ -237,13 +237,13 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
                   _buildDetailRow(
                       'Base Amount',
                       e.amountBase != null
-                          ? 'AED ${e.amountBase!.toStringAsFixed(2)}'
+                          ? '${e.currency} ${e.amountBase!.toStringAsFixed(2)}'
                           : 'N/A'),
                   const Divider(color: Color(0xFFE2E8F0), height: 1),
                   _buildDetailRow(
                       'VAT Amount',
                       e.vatApplicable
-                          ? 'AED ${e.vatAmount.toStringAsFixed(2)}'
+                          ? '${e.currency} ${e.vatAmount.toStringAsFixed(2)}'
                           : 'N/A'),
                 ],
               ),
@@ -263,7 +263,7 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'VAT Included: AED ${e.vatAmount.toStringAsFixed(2)} at 5%',
+                        'VAT Included: ${e.currency} ${e.vatAmount.toStringAsFixed(2)}',
                         style: const TextStyle(
                             color: Color(0xFF0D9488),
                             fontWeight: FontWeight.w600),

@@ -7,11 +7,12 @@ const TRN_STATUS_CONFIG = {
   not_provided: { label: 'Not Provided', cls: 'bg-slate-100 text-slate-500' }
 };
 
-export default function ExpenseDetailModal({ expense, onClose }) {
+export default function ExpenseDetailModal({ expense, baseCurrency = 'AED', onClose }) {
   if (!expense) return null;
 
   const trnCfg = TRN_STATUS_CONFIG[expense.trnStatus] ?? TRN_STATUS_CONFIG.not_provided;
   const hasFlags = expense.policyFlags && expense.policyFlags.length > 0;
+  const curr = expense.amountBase != null ? baseCurrency : (expense.currency || baseCurrency);
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -57,11 +58,11 @@ export default function ExpenseDetailModal({ expense, onClose }) {
             </div>
             <div>
               <p className="text-xs uppercase tracking-wide text-slate-500">Amount</p>
-              <p className="text-sm text-slate-900 font-medium">{formatAmount(expense.amountBase ?? expense.amount, 'AED')}</p>
+              <p className="text-sm text-slate-900 font-medium">{formatAmount(expense.amountBase ?? expense.amount, curr)}</p>
             </div>
             <div>
               <p className="text-xs uppercase tracking-wide text-slate-500">VAT</p>
-              <p className="text-sm text-slate-900 font-medium">{formatAmount(expense.vatAmount ?? 0, 'AED')}</p>
+              <p className="text-sm text-slate-900 font-medium">{formatAmount(expense.vatAmount ?? 0, curr)}</p>
             </div>
             <div>
               <p className="text-xs uppercase tracking-wide text-slate-500">Status</p>

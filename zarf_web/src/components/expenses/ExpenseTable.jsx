@@ -1,7 +1,7 @@
 import ExpenseStatusBadge from './ExpenseStatusBadge';
 import { formatAmount } from '../../utils/formatCurrency';
 
-export default function ExpenseTable({ items, loading, sortKey, sortOrder, onSort, onAction, onView }) {
+export default function ExpenseTable({ items, loading, sortKey, sortOrder, baseCurrency = 'AED', onSort, onAction, onView }) {
   const renderHeader = (label, key) => (
     <button
       type="button"
@@ -39,12 +39,14 @@ export default function ExpenseTable({ items, loading, sortKey, sortOrder, onSor
               <td colSpan={9} className="px-5 py-10 text-center text-sm text-slate-500">No expenses found for these filters.</td>
             </tr>
           ) : (
-            items.map((expense) => (
-              <tr key={expense._id || expense.id} className="hover:bg-slate-50/50 transition-colors">
-                <td className="px-5 py-3.5 font-medium text-slate-800">{expense.userId?.name || expense.userName || '-'}</td>
-                <td className="px-5 py-3.5 text-slate-600">{expense.notes || '-'}</td>
-                <td className="px-5 py-3.5 font-semibold text-slate-800">{formatAmount(expense.amountBase ?? expense.amount, 'AED')}</td>
-                <td className="px-5 py-3.5 text-slate-600">{formatAmount(expense.vatAmount ?? 0, 'AED')}</td>
+            items.map((expense) => {
+              const curr = expense.amountBase != null ? baseCurrency : (expense.currency || baseCurrency);
+              return (
+                <tr key={expense._id || expense.id} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="px-5 py-3.5 font-medium text-slate-800">{expense.userId?.name || expense.userName || '-'}</td>
+                  <td className="px-5 py-3.5 text-slate-600">{expense.notes || '-'}</td>
+                  <td className="px-5 py-3.5 font-semibold text-slate-800">{formatAmount(expense.amountBase ?? expense.amount, curr)}</td>
+                  <td className="px-5 py-3.5 text-slate-600">{formatAmount(expense.vatAmount ?? 0, curr)}</td>
                 <td className="px-5 py-3.5">
                   <span className="inline-block text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded capitalize">{expense.category}</span>
                 </td>
@@ -85,8 +87,9 @@ export default function ExpenseTable({ items, loading, sortKey, sortOrder, onSor
                   </div>
                 </td>
               </tr>
-            ))
-          )}
+            );
+          })
+        )}
         </tbody>
       </table>
     </div>

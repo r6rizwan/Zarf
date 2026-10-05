@@ -33,13 +33,13 @@ const cardConfig = {
   },
 };
 
-export default function StatCard({ label, value }) {
+export default function StatCard({ label, value, currency = 'AED' }) {
   const config = cardConfig[label] || cardConfig['Total Spend'];
   const Icon = config.icon;
 
   // Avoid passing non-numeric values into currency formatter which yields "NaN".
   const displayValueRaw = config.isCurrency
-    ? (typeof value === 'number' ? formatAmount(value, 'AED') : value)
+    ? (typeof value === 'number' ? formatAmount(value, currency) : value)
     : value;
 
   const isLoading = displayValueRaw === 'Loading...';

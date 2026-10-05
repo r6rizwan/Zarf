@@ -71,10 +71,10 @@ export default function DashboardPage() {
 
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total Spend" value={isSummaryLoading ? 'Loading...' : summaryQuery.data?.totalSpend ?? 0} />
-        <StatCard label="Pending Approvals" value={isSummaryLoading ? 'Loading...' : summaryQuery.data?.pendingCount ?? 0} />
-        <StatCard label="Approved Total" value={isSummaryLoading ? 'Loading...' : summaryQuery.data?.approvedTotal ?? 0} />
-        <StatCard label="Total VAT" value={isSummaryLoading ? 'Loading...' : summaryQuery.data?.totalVAT ?? 0} />
+        <StatCard label="Total Spend" value={isSummaryLoading ? 'Loading...' : summaryQuery.data?.totalSpend ?? 0} currency={summaryQuery.data?.currency} />
+        <StatCard label="Pending Approvals" value={isSummaryLoading ? 'Loading...' : summaryQuery.data?.pendingCount ?? 0} currency={summaryQuery.data?.currency} />
+        <StatCard label="Approved Total" value={isSummaryLoading ? 'Loading...' : summaryQuery.data?.approvedTotal ?? 0} currency={summaryQuery.data?.currency} />
+        <StatCard label="Total VAT" value={isSummaryLoading ? 'Loading...' : summaryQuery.data?.totalVAT ?? 0} currency={summaryQuery.data?.currency} />
       </div>
 
       {/* Charts */}

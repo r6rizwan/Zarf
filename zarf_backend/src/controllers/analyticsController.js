@@ -25,7 +25,7 @@ export const getSummary = async (req, res, next) => {
   try {
     const match = baseMatch(req, req.query.month, req.query.year);
 
-    const [approvedAgg, pendingCount, vatAgg] = await Promise.all([
+    const [approvedAgg, pendingCount, vatAgg, company] = await Promise.all([
       Expense.aggregate([
         { $match: { ...match, status: 'approved' } },
         { $group: { _id: null, total: { $sum: { $ifNull: ['$amountBase', 0] } } } }
@@ -34,11 +34,13 @@ export const getSummary = async (req, res, next) => {
       Expense.aggregate([
         { $match: { ...match, vatApplicable: true } },
         { $group: { _id: null, total: { $sum: { $ifNull: ['$vatAmount', 0] } } } }
-      ])
+      ]),
+      Company.findById(req.user.companyId).select('baseCurrency').lean()
     ]);
 
     const approvedTotal = approvedAgg[0]?.total || 0;
     const totalVAT = vatAgg[0]?.total || 0;
+    const currency = company?.baseCurrency || 'AED';
 
     res.json({
       success: true,
@@ -46,7 +48,8 @@ export const getSummary = async (req, res, next) => {
         totalSpend: approvedTotal,
         pendingCount,
         approvedTotal,
-        totalVAT
+        totalVAT,
+        currency
       }
     });
   } catch (err) {
@@ -80,14 +83,17 @@ export const getByEmployee = async (req, res, next) => {
   try {
     const match = baseMatch(req, req.query.month, req.query.year);
 
-    const totals = await Expense.aggregate([
-      { $match: { ...match, status: 'approved' } },
-      {
-        $group: {
-          _id: '$userId',
-          total: { $sum: { $ifNull: ['$amountBase', 0] } }
+    const [totals, company] = await Promise.all([
+      Expense.aggregate([
+        { $match: { ...match, status: 'approved' } },
+        {
+          $group: {
+            _id: '$userId',
+            total: { $sum: { $ifNull: ['$amountBase', 0] } }
+          }
         }
-      }
+      ]),
+      Company.findById(req.user.companyId).select('baseCurrency').lean()
     ]);
 
     const totalsMap = new Map(totals.map((t) => [t._id.toString(), t.total]));
@@ -95,6 +101,7 @@ export const getByEmployee = async (req, res, next) => {
       .select('name email')
       .lean();
 
+    const currency = company?.baseCurrency || 'AED';
     const data = employees
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((employee) => ({
@@ -104,7 +111,7 @@ export const getByEmployee = async (req, res, next) => {
         total: totalsMap.get(employee._id.toString()) || 0
       }));
 
-    res.json({ success: true, data });
+    res.json({ success: true, data, currency });
   } catch (err) {
     next(err);
   }

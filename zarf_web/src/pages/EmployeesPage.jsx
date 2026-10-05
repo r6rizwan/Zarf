@@ -92,7 +92,7 @@ export default function EmployeesPage() {
                 <tr key={String(item.userId)} className="hover:bg-slate-50/50 transition-colors">
                   <td className="px-5 py-3.5 font-medium text-slate-800">{item.name}</td>
                   <td className="px-5 py-3.5 text-slate-600">{item.email || '-'}</td>
-                  <td className="px-5 py-3.5 font-semibold text-slate-800">{formatAmount(item.total, 'AED')}</td>
+                  <td className="px-5 py-3.5 font-semibold text-slate-800">{formatAmount(item.total, query.data?.currency || 'AED')}</td>
                 </tr>
               ))
             )}

@@ -245,7 +245,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                 hintText: '0.00',
                 hintStyle: TextStyle(
                     color: const Color(0xFF64748B).withValues(alpha: 0.5)),
-                prefixText: 'AED ',
+                prefixText: '$_currency ',
                 prefixStyle: const TextStyle(
                     color: Color(0xFF0D9488),
                     fontSize: 24,
@@ -333,7 +333,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
               ],
             ),
             if (_vatApplicable)
-              Text('VAT: AED ${_vatAmount.toStringAsFixed(2)}',
+              Text('VAT: $_currency ${_vatAmount.toStringAsFixed(2)}',
                   style: const TextStyle(
                       color: Color(0xFF0D9488),
                       fontSize: 12,

@@ -51,6 +51,12 @@ export default function ExpensesPage() {
     setPage(1);
   };
 
+  const companyQuery = useQuery({
+    queryKey: ['company-me'],
+    queryFn: async () => (await axiosClient.get('/company/me')).data.data
+  });
+  const baseCurrency = companyQuery.data?.baseCurrency || 'AED';
+
   const expensesQuery = useQuery({
     queryKey: ['expenses', page, filters, sortKey, sortOrder],
     queryFn: async () => {
@@ -214,12 +220,14 @@ export default function ExpensesPage() {
         loading={isLoading}
         sortKey={sortKey}
         sortOrder={sortOrder}
+        baseCurrency={baseCurrency}
         onSort={handleSort}
         onAction={(expense, action) => setModal({ open: true, expense, action })}
         onView={(expense) => setDetailExpense(expense)}
       />
       <ExpenseDetailModal
         expense={detailExpense}
+        baseCurrency={baseCurrency}
         onClose={() => setDetailExpense(null)}
       />
 

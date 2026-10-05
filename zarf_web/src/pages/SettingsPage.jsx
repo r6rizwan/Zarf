@@ -9,7 +9,7 @@ const EXPENSE_CATEGORIES = [
 
 // ── Policy row ──────────────────────────────────────────────────────────────
 
-function PolicyRow({ policy, onToggle, onDelete, isPending }) {
+function PolicyRow({ policy, baseCurrency = 'AED', onToggle, onDelete, isPending }) {
   const typeLabel =
     policy.type === 'amount_limit' ? 'Amount Limit' : 'Weekend Submission';
 
@@ -32,7 +32,7 @@ function PolicyRow({ policy, onToggle, onDelete, isPending }) {
         <p className="mt-0.5 text-xs text-slate-500">
           {typeLabel}
           {policy.category ? ` · ${policy.category}` : ' · All Categories'}
-          {policy.threshold != null ? ` · >${policy.threshold} AED` : ''}
+          {policy.threshold != null ? ` · >${policy.threshold} ${baseCurrency}` : ''}
         </p>
       </div>
 
@@ -67,7 +67,7 @@ const defaultNewPolicy = {
   action: 'warn'
 };
 
-function AddPolicyForm({ onSave, onCancel, isPending }) {
+function AddPolicyForm({ baseCurrency = 'AED', onSave, onCancel, isPending }) {
   const [form, setForm] = useState(defaultNewPolicy);
 
   const isValid =
@@ -128,7 +128,7 @@ function AddPolicyForm({ onSave, onCancel, isPending }) {
 
         {form.type === 'amount_limit' && (
           <div>
-            <label className="mb-1 block text-xs text-slate-500">Max Amount (AED)</label>
+            <label className="mb-1 block text-xs text-slate-500">Max Amount ({baseCurrency})</label>
             <input
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm placeholder-slate-400"
               type="number"
@@ -370,6 +370,7 @@ export default function SettingsPage() {
             <PolicyRow
               key={policy._id}
               policy={policy}
+              baseCurrency={form.baseCurrency}
               isPending={updatePolicyMutation.isPending || deletePolicyMutation.isPending}
               onToggle={(id, enabled) => updatePolicyMutation.mutate({ id, enabled })}
               onDelete={(id) => deletePolicyMutation.mutate(id)}
@@ -379,6 +380,7 @@ export default function SettingsPage() {
 
         {showAddForm && (
           <AddPolicyForm
+            baseCurrency={form.baseCurrency}
             isPending={createPolicyMutation.isPending}
             onSave={(data) => createPolicyMutation.mutate(data)}
             onCancel={() => setShowAddForm(false)}
