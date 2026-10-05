@@ -12,6 +12,7 @@ class ParsedReceipt {
   final String? category;
   final bool? vatApplicable;
   final double? vatAmount;
+  final String? vendorTrn;
 
   const ParsedReceipt({
     required this.merchant,
@@ -21,6 +22,7 @@ class ParsedReceipt {
     required this.category,
     required this.vatApplicable,
     required this.vatAmount,
+    this.vendorTrn,
   });
 
   factory ParsedReceipt.fromJson(Map<String, dynamic> json) => ParsedReceipt(
@@ -33,6 +35,7 @@ class ParsedReceipt {
         category: json['category']?.toString(),
         vatApplicable: json['vatApplicable'] as bool?,
         vatAmount: (json['vatAmount'] as num?)?.toDouble(),
+        vendorTrn: json['vendorTrn']?.toString(),
       );
 }
 

@@ -19,6 +19,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
   final _repo = ExpenseRepo();
   final _amount = TextEditingController();
   final _notes = TextEditingController();
+  final _vendorTrn = TextEditingController();
   String _category = expenseCategories.first;
   String _currency = expenseCurrencies.first;
   String _paymentMethod = paymentMethods.first;
@@ -29,6 +30,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
   bool _aiCurrency = false;
   bool _aiDate = false;
   bool _aiNotes = false;
+  bool _aiTrn = false;
   bool _loading = false;
 
   Future<void> _submit() async {
@@ -46,13 +48,18 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
         vatAmount: _vatAmount,
         paymentMethod: _paymentMethod,
         date: _date,
+        vendorTrn: _vendorTrn.text.trim().isNotEmpty ? _vendorTrn.text.trim() : null,
       );
       await _repo.createExpense(dto);
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
       if (mounted) {
+        String msg = 'Failed to save expense.';
+        if (e.toString().contains('blocked by corporate policy')) {
+          msg = e.toString().replaceAll('Exception: ', '');
+        }
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to save expense.')),
+          SnackBar(content: Text(msg), backgroundColor: Colors.red.shade700),
         );
       }
     } finally {
@@ -118,6 +125,10 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
         _notes.text = parsed.merchant!.trim();
         _aiNotes = true;
       }
+      if (parsed.vendorTrn != null && parsed.vendorTrn!.trim().isNotEmpty) {
+        _vendorTrn.text = parsed.vendorTrn!.trim();
+        _aiTrn = true;
+      }
       if (parsed.category != null) {
         final matchedCategory = expenseCategories.firstWhere(
           (cat) => cat.toLowerCase() == parsed.category!.trim().toLowerCase(),
@@ -146,6 +157,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
   void dispose() {
     _amount.dispose();
     _notes.dispose();
+    _vendorTrn.dispose();
     super.dispose();
   }
 
@@ -206,7 +218,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                 label: const Text('Scan Receipt'),
               ),
             ),
-            if (_aiCurrency || _aiDate || _aiNotes)
+            if (_aiCurrency || _aiDate || _aiNotes || _aiTrn)
               Padding(
                 padding: const EdgeInsets.only(top: 16, bottom: 16),
                 child: Wrap(
@@ -216,6 +228,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                     if (_aiCurrency) _buildAiTag('Currency auto-filled'),
                     if (_aiDate) _buildAiTag('Date auto-filled'),
                     if (_aiNotes) _buildAiTag('Merchant auto-filled'),
+                    if (_aiTrn) _buildAiTag('Vendor TRN auto-filled'),
                   ],
                 ),
               ),
@@ -274,6 +287,11 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
             TextField(
               controller: _notes,
               decoration: _decor('Notes', aiFilled: _aiNotes),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _vendorTrn,
+              decoration: _decor('Vendor TRN (Optional)', aiFilled: _aiTrn),
             ),
             const SizedBox(height: 16),
             InkWell(

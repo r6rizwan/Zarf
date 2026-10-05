@@ -19,8 +19,8 @@ gantt
     Category and VAT Auto-Extraction    :done, p5, 2026-05, 2026-06
     Keyboard Focus Polish             :done, p6, 2026-05, 2026-06
     section Phase 3 - GCC Integrations
-    TRN Tax Entity Validation         :active, p7, 2026-06, 2026-07
-    FCM Push Notification Pipelines   :done, p8, 2026-07, 2026-08
+    TRN Tax Entity Validation         :done, p7, 2026-06, 2026-07
+    Automated Corporate Policies      :done, p8, 2026-07, 2026-08
     section Phase 4 - Future Horizon
     Arabic RTL Localization           : p9, 2026-09, 2026-10
     Offline-First Synchronization     : p10, 2026-10, 2026-12
@@ -48,9 +48,9 @@ gantt
 
 ---
 
-## ⚡ Phase 3: Advanced GCC Compliance & Utilities (In Progress)
-*   **TRN Entity Verification (UAE/Saudi):** Integrate with GCC tax authority open APIs to validate vendor Tax Registration Numbers (TRN) in real time when parsing receipts.
-*   **Automated Corporate Policies:** Implement customizable spending rules (e.g., auto-flagging meals over 300 AED or travel expenses submitted on weekends).
+## ✅ Phase 3: Advanced GCC Compliance & Utilities (100% Completed)
+*   **TRN Tax Format & Entity Validation (UAE/Saudi):** Added automatic vendor Tax Registration Number (TRN) extraction via Llama 4 Scout, 15-digit structure format validation (UAE `1x...`, Saudi `3x...`), and FTA verification portal quick links across mobile and web.
+*   **Automated Corporate Policy Engine:** Implemented configurable spending policy rules (`amount_limit`, `weekend_submission`) with category filters and enforcement modes (`warn` flags for review, `block` prevents submission). Built full CRUD management UI in Web Settings and integrated policy checking into the expense submission pipeline.
 
 ---
 

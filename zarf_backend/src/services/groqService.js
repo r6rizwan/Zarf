@@ -4,7 +4,7 @@ import env from '../config/env.js';
 const groq = new Groq({ apiKey: env.GROQ_API_KEY });
 
 const extractionPrompt =
-  'Extract the following fields from this receipt image and return ONLY a JSON object with no markdown or explanation: { merchant: string, amount: number, currency: string (3-letter ISO), date: string (YYYY-MM-DD), category: string, vatApplicable: boolean, vatAmount: number } For category, infer the closest option from this list: ["Travel", "Meals", "Accommodation", "Office Supplies", "Client Entertainment", "Other"]. For vatApplicable, set to true if any VAT, tax, or GST is found on the receipt. For vatAmount, set to the total VAT/tax amount charged on the receipt. If a field cannot be determined, set it to null (or false/0 for vatApplicable/vatAmount).';
+  'Extract the following fields from this receipt image and return ONLY a JSON object with no markdown or explanation: { merchant: string, amount: number, currency: string (3-letter ISO), date: string (YYYY-MM-DD), category: string, vatApplicable: boolean, vatAmount: number, vendorTrn: string } For category, infer the closest option from this list: ["Travel", "Meals", "Accommodation", "Office Supplies", "Client Entertainment", "Other"]. For vatApplicable, set to true if any VAT, tax, or GST is found on the receipt. For vatAmount, set to the total VAT/tax amount charged on the receipt. For vendorTrn, extract the vendor\'s Tax Registration Number or VAT registration number printed on the receipt (usually labelled TRN, VAT No, Tax No, or similar). If a field cannot be determined, set it to null (or false/0 for vatApplicable/vatAmount).';
 
 const parseAndValidate = (rawText) => {
   let parsed;
@@ -26,7 +26,8 @@ const parseAndValidate = (rawText) => {
     date: parsed.date ?? null,
     category: parsed.category ?? null,
     vatApplicable: parsed.vatApplicable ?? false,
-    vatAmount: parsed.vatAmount ?? 0
+    vatAmount: parsed.vatAmount ?? 0,
+    vendorTrn: (parsed.vendorTrn && typeof parsed.vendorTrn === 'string') ? parsed.vendorTrn.trim() : null
   };
 
   const validTypes =
@@ -36,7 +37,8 @@ const parseAndValidate = (rawText) => {
     (normalized.date === null || typeof normalized.date === 'string') &&
     (normalized.category === null || typeof normalized.category === 'string') &&
     (typeof normalized.vatApplicable === 'boolean') &&
-    (typeof normalized.vatAmount === 'number');
+    (typeof normalized.vatAmount === 'number') &&
+    (normalized.vendorTrn === null || typeof normalized.vendorTrn === 'string');
 
   if (!validTypes) {
     throw new Error('Groq response had invalid field types');

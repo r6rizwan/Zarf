@@ -1,8 +1,17 @@
 import { formatAmount } from '../../utils/formatCurrency';
 import ExpenseStatusBadge from './ExpenseStatusBadge';
 
+const TRN_STATUS_CONFIG = {
+  format_valid: { label: 'Format Valid', cls: 'bg-teal-100 text-teal-700' },
+  format_invalid: { label: 'Invalid Format', cls: 'bg-red-100 text-red-700' },
+  not_provided: { label: 'Not Provided', cls: 'bg-slate-100 text-slate-500' }
+};
+
 export default function ExpenseDetailModal({ expense, onClose }) {
   if (!expense) return null;
+
+  const trnCfg = TRN_STATUS_CONFIG[expense.trnStatus] ?? TRN_STATUS_CONFIG.not_provided;
+  const hasFlags = expense.policyFlags && expense.policyFlags.length > 0;
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -61,6 +70,46 @@ export default function ExpenseDetailModal({ expense, onClose }) {
           </div>
         </div>
 
+        {/* Vendor TRN */}
+        <div className="mt-4 flex items-center gap-3">
+          <div className="flex-1">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Vendor TRN</p>
+            <p className="text-sm text-slate-900 font-medium font-mono">
+              {expense.vendorTrn || <span className="text-slate-400 font-sans">—</span>}
+            </p>
+          </div>
+          <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${trnCfg.cls}`}>
+            {trnCfg.label}
+          </span>
+          {expense.trnStatus === 'format_valid' && (
+            <a
+              href="https://tax.gov.ae"
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs text-teal-600 hover:underline whitespace-nowrap"
+            >
+              Verify on FTA ↗
+            </a>
+          )}
+        </div>
+
+        {/* Policy flags */}
+        {hasFlags && (
+          <div className="mt-4">
+            <p className="text-xs uppercase tracking-wide text-slate-500 mb-1.5">Policy Flags</p>
+            <div className="flex flex-wrap gap-1.5">
+              {expense.policyFlags.map((flag) => (
+                <span
+                  key={flag}
+                  className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700"
+                >
+                  ⚠ {flag}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="mt-6 space-y-3">
           <div>
             <p className="text-xs uppercase tracking-wide text-slate-500">Notes</p>
@@ -86,3 +135,4 @@ export default function ExpenseDetailModal({ expense, onClose }) {
     </div>
   );
 }
+

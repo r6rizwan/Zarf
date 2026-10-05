@@ -12,6 +12,9 @@ class Expense {
   final bool vatApplicable;
   final num vatAmount;
   final String? paymentMethod;
+  final String? vendorTrn;
+  final String? trnStatus;
+  final List<String> policyFlags;
   final String status;
   final String? reviewedBy;
   final String? reviewNote;
@@ -32,6 +35,9 @@ class Expense {
     required this.vatApplicable,
     required this.vatAmount,
     required this.paymentMethod,
+    this.vendorTrn,
+    this.trnStatus,
+    this.policyFlags = const [],
     required this.status,
     required this.reviewedBy,
     required this.reviewNote,
@@ -52,6 +58,12 @@ class Expense {
       parsedUserId = rawUser?.toString() ?? '';
     }
 
+    final rawFlags = json['policyFlags'];
+    List<String> parsedFlags = [];
+    if (rawFlags is List) {
+      parsedFlags = rawFlags.map((e) => e.toString()).toList();
+    }
+
     return Expense(
       id: json['id']?.toString() ?? json['_id']?.toString() ?? '',
       userId: parsedUserId,
@@ -66,6 +78,9 @@ class Expense {
       vatApplicable: json['vatApplicable'] ?? false,
       vatAmount: json['vatAmount'] ?? 0,
       paymentMethod: json['paymentMethod'],
+      vendorTrn: json['vendorTrn']?.toString(),
+      trnStatus: json['trnStatus']?.toString(),
+      policyFlags: parsedFlags,
       status: json['status'] ?? 'pending',
       reviewedBy: json['reviewedBy']?.toString(),
       reviewNote: json['reviewNote'],
@@ -89,6 +104,9 @@ class Expense {
         'vatApplicable': vatApplicable,
         'vatAmount': vatAmount,
         'paymentMethod': paymentMethod,
+        'vendorTrn': vendorTrn,
+        'trnStatus': trnStatus,
+        'policyFlags': policyFlags,
         'status': status,
         'reviewedBy': reviewedBy,
         'reviewNote': reviewNote,
@@ -106,6 +124,7 @@ class ExpenseCreateDto {
   final num vatAmount;
   final String paymentMethod;
   final DateTime date;
+  final String? vendorTrn;
 
   ExpenseCreateDto({
     required this.amount,
@@ -116,6 +135,7 @@ class ExpenseCreateDto {
     required this.vatAmount,
     required this.paymentMethod,
     required this.date,
+    this.vendorTrn,
   });
 
   Map<String, dynamic> toJson() => {
@@ -127,5 +147,6 @@ class ExpenseCreateDto {
         'vatAmount': vatAmount,
         'paymentMethod': paymentMethod,
         'date': date.toIso8601String(),
+        if (vendorTrn != null && vendorTrn!.isNotEmpty) 'vendorTrn': vendorTrn,
       };
 }

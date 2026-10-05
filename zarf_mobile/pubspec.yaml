@@ -1,7 +1,7 @@
 name: zarf_mobile
-description: Zarf mobile app
+description: Zarf Mobile — Corporate Expense Management with AI OCR, TRN Validation & Policy Engine
 publish_to: 'none'
-version: 1.0.3+4
+version: 1.1.0+5
 
 environment:
   sdk: '>=3.3.0 <4.0.0'

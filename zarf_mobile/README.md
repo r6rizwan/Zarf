@@ -10,7 +10,8 @@ Zarf Mobile dynamically shifts its UI components and layouts depending on the lo
 
 *   **📱 Standard Employees:**
     *   **3-Tab Layout:** Dashboard (Home), Expense History, and Profile.
-    *   **AI OCR Scanning:** Take photos of receipts to auto-fill amount, currency, merchant, and dates instantly via Groq API.
+    *   **AI OCR Scanning:** Take photos of receipts to auto-fill amount, currency, merchant, dates, and vendor TRN instantly via Groq API (Llama 4 Scout).
+    *   **TRN & Policy Awareness:** Captures vendor TRN, validates 15-digit GCC formats (UAE/Saudi), and notifies employees if a submission violates company spending policies.
     *   **VAT & Multi-Currency:** Dynamic UAE (5%) / GCC VAT toggles, live AED conversion rates, and clean numeric formatting (e.g., `AED 1,000.00`).
 *   **💼 Managers & Admins:**
     *   **4-Tab Layout:** Dynamically adds a dedicated **Approvals** tab while preserving the main "Home" personal dashboard.

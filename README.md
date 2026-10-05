@@ -24,7 +24,9 @@
 
 ## Features
 - **AI-Powered Receipt Scanning:** OCR and entity extraction using Groq's high-speed **Llama 4 Scout** vision model.
-- **Multi-Parameter Extraction:** Automatically extracts and populates Merchant, Amount, Currency, Date, **Category classification**, and **VAT/Tax details** directly from photo assets.
+- **Multi-Parameter Extraction:** Automatically extracts and populates Merchant, Amount, Currency, Date, **Category classification**, **VAT/Tax details**, and **Vendor TRN (Tax Registration Number)** directly from photo assets.
+- **TRN Tax Entity Validation (UAE/Saudi):** Automatically validates vendor TRN format (UAE 15-digit starting with 1, Saudi starting with 3) and provides direct deep-links to official tax verification portals (e.g. Federal Tax Authority).
+- **Automated Corporate Policy Engine:** Configurable spending policy rules (`amount_limit`, `weekend_submission`) with category filtering and real-time enforcement (`warn` flags for review, `block` prevents submission).
 - **Smart VAT Toggling:** Instantly detects if tax was charged, flips the VAT switch to ON in the UI, and fills the exact tax amount.
 - **Image Compression Engine:** Scaler on mobile compressing raw photos to 1024x1024 / 85% quality, reducing network transfer payloads from 12MB down to ~150KB.
 - **Free-Tier Performance Optimizations:** Health-check keep-alive pinging, compressed API responses, lean Mongo reads, trimmed expense-list payloads, and in-memory mobile caching to reduce Render cold-start pain.

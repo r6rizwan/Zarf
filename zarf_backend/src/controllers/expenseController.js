@@ -2,12 +2,14 @@ import fs from 'fs/promises';
 import { v2 as cloudinary } from 'cloudinary';
 import Company from '../models/Company.js';
 import Expense from '../models/Expense.js';
+import Policy from '../models/Policy.js';
 import User from '../models/User.js';
 import { cleanupTempFile } from '../middleware/uploadMiddleware.js';
 import { ForbiddenError, NotFoundError, ValidationError } from '../middleware/errorHandler.js';
 import { convert, getRates } from '../services/currencyService.js';
 import { sendNotification } from '../services/fcmService.js';
 import { parseReceipt } from '../services/groqService.js';
+import { validateTrn } from '../services/trnService.js';
 
 cloudinary.config({ secure: true });
 
@@ -111,7 +113,8 @@ export const createExpense = async (req, res, next) => {
       vatApplicable,
       vatAmount,
       paymentMethod,
-      date
+      date,
+      vendorTrn
     } = req.body;
 
     if (!amount || !currency || !category || !date) {
@@ -146,6 +149,56 @@ export const createExpense = async (req, res, next) => {
       amountBase = convert(amount, fromCurrency, toCurrency, rates);
     }
 
+    // ── TRN format validation ──────────────────────────────────────────────
+    const { status: trnStatus } = validateTrn(vendorTrn);
+
+    // ── Corporate policy enforcement ───────────────────────────────────────
+    const policies = await Policy.find({
+      companyId: req.user.companyId,
+      enabled: true
+    }).lean();
+
+    const policyFlags = [];
+    const blockers = [];
+
+    // GCC weekend = Friday (5) + Saturday (6); adapt as needed per locale
+    const dayOfWeek = expenseDate.getDay(); // 0=Sun … 6=Sat
+    const isWeekend = dayOfWeek === 5 || dayOfWeek === 6;
+
+    for (const policy of policies) {
+      const matchesCategory =
+        !policy.category ||
+        policy.category.toLowerCase() === String(category).toLowerCase();
+
+      let violated = false;
+
+      if (policy.type === 'amount_limit' && policy.threshold != null) {
+        const compareAmount = amountBase ?? parsedAmount;
+        if (matchesCategory && compareAmount > policy.threshold) {
+          violated = true;
+        }
+      } else if (policy.type === 'weekend_submission') {
+        if (matchesCategory && isWeekend) {
+          violated = true;
+        }
+      }
+
+      if (violated) {
+        if (policy.action === 'block') {
+          blockers.push(policy.name);
+        } else {
+          policyFlags.push(policy.name);
+        }
+      }
+    }
+
+    if (blockers.length > 0) {
+      throw new ValidationError(
+        `Expense blocked by corporate policy: ${blockers.join('; ')}`
+      );
+    }
+
+    // ── Persist ────────────────────────────────────────────────────────────
     const expense = await Expense.create({
       userId: req.user.id,
       companyId: req.user.companyId,
@@ -157,7 +210,10 @@ export const createExpense = async (req, res, next) => {
       vatAmount,
       paymentMethod,
       date,
-      amountBase
+      amountBase,
+      vendorTrn: vendorTrn || null,
+      trnStatus,
+      policyFlags
     });
 
     res.status(201).json({ success: true, data: expense });
