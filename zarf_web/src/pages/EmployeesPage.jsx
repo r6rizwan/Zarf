@@ -12,12 +12,12 @@ export default function EmployeesPage() {
 
   const query = useQuery({
     queryKey: ['analytics-by-employee', month, year],
-    queryFn: async () => (await axiosClient.get('/analytics/by-employee', { params: { month, year } })).data.data
+    queryFn: async () => (await axiosClient.get('/analytics/by-employee', { params: { month, year } })).data
   });
 
   const isLoading = query.isFetching && !query.data;
   const sortedData = useMemo(() => {
-    const list = [...(query.data || [])];
+    const list = [...(query.data?.data || [])];
 
     return list.sort((a, b) => {
       const direction = sortOrder === 'asc' ? 1 : -1;
@@ -28,7 +28,7 @@ export default function EmployeesPage() {
 
       return a.name.localeCompare(b.name) * direction;
     });
-  }, [query.data, sortKey, sortOrder]);
+  }, [query.data?.data, sortKey, sortOrder]);
 
   const handleSort = (key) => {
     if (sortKey === key) {
