@@ -14,7 +14,7 @@ export default function Sidebar() {
   const location = useLocation();
 
   return (
-    <aside className="w-64 min-h-screen flex flex-col" style={{ backgroundColor: '#0f172a' }}>
+    <aside className="sticky top-0 self-start w-64 h-screen flex flex-col" style={{ backgroundColor: '#0f172a' }}>
       {/* Logo */}
       <div className="px-5 py-6 flex items-center gap-2.5">
         <div className="w-9 h-9 rounded-lg bg-teal-600 flex items-center justify-center">
