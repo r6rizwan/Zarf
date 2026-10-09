@@ -247,8 +247,6 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-xl space-y-8">
-      <h2 className="text-2xl font-bold text-slate-800">Company Settings</h2>
-
       {/* ── Company details ──────────────────────────────────────────────── */}
       <div className="rounded-xl bg-white p-6 shadow-sm space-y-5">
         <h3 className="text-base font-semibold text-slate-700">General</h3>

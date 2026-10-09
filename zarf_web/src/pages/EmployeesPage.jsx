@@ -42,7 +42,6 @@ export default function EmployeesPage() {
   return (
     <div className="space-y-5">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-slate-800">Employees</h2>
         <input
           type="month"
           value={`${year}-${String(month).padStart(2, '0')}`}

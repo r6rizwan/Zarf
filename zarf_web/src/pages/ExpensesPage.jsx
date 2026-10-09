@@ -143,7 +143,6 @@ export default function ExpensesPage() {
   return (
     <div className="space-y-5">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-slate-800">Expenses</h2>
         <ExportCSVButton rows={data.map((e) => ({
           employee: e.userId?.name,
           merchant: e.notes,

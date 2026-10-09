@@ -53,14 +53,10 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <h2 className="text-2xl font-bold text-slate-800">Dashboard</h2>
-          <span className="inline-flex items-center text-xs font-semibold text-teal-700 bg-teal-50 px-2.5 py-1 rounded-full">
-            {monthNames[month - 1]} {year}
-          </span>
-        </div>
+        <span className="inline-flex items-center text-xs font-semibold text-teal-700 bg-teal-50 px-2.5 py-1 rounded-full">
+          {monthNames[month - 1]} {year}
+        </span>
         <input
           type="month"
           value={`${year}-${String(month).padStart(2, '0')}`}
