@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../data/models/user.dart';
 import '../../data/services/api_service.dart';
 import '../../data/services/update_service.dart';
+import '../../l10n/app_localizations.dart';
 
 class MainScaffold extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
@@ -77,6 +78,7 @@ class _MainScaffoldState extends State<MainScaffold> {
   Widget _buildUpdateBanner() {
     final info = _updateInfo;
     if (info == null) return const SizedBox.shrink();
+    final l10n = AppLocalizations.of(context)!;
 
     return Material(
       color: const Color(0xFFE0F2FE),
@@ -94,7 +96,7 @@ class _MainScaffoldState extends State<MainScaffold> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Update available: v${info.latestVersion}',
+                      l10n.updateAvailable(info.latestVersion),
                       style: const TextStyle(
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF0F172A),
@@ -102,7 +104,7 @@ class _MainScaffoldState extends State<MainScaffold> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'You are on v${info.currentVersion}. Download the latest build from GitHub Releases.',
+                      l10n.currentVersionUpdate(info.currentVersion),
                       style: const TextStyle(
                         fontSize: 12,
                         color: Color(0xFF334155),
@@ -114,12 +116,12 @@ class _MainScaffoldState extends State<MainScaffold> {
               const SizedBox(width: 8),
               TextButton(
                 onPressed: () => UpdateService.instance.openDownload(info),
-                child: const Text('Update'),
+                child: Text(l10n.update),
               ),
               IconButton(
                 onPressed: () => setState(() => _updateInfo = null),
                 icon: const Icon(Icons.close, size: 18),
-                tooltip: 'Dismiss',
+                tooltip: l10n.dismiss,
               ),
             ],
           ),
@@ -131,6 +133,7 @@ class _MainScaffoldState extends State<MainScaffold> {
   @override
   Widget build(BuildContext context) {
     final isManager = _user?.role == 'manager' || _user?.role == 'admin';
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: Column(
@@ -143,26 +146,26 @@ class _MainScaffoldState extends State<MainScaffold> {
         selectedIndex: _calculateSelectedIndex(),
         onDestinationSelected: _onItemTapped,
         destinations: [
-          const NavigationDestination(
-            icon: Icon(Icons.dashboard_outlined),
-            selectedIcon: Icon(Icons.dashboard),
-            label: 'Home',
+          NavigationDestination(
+            icon: const Icon(Icons.dashboard_outlined),
+            selectedIcon: const Icon(Icons.dashboard),
+            label: l10n.home,
           ),
           if (isManager)
-            const NavigationDestination(
-              icon: Icon(Icons.fact_check_outlined),
-              selectedIcon: Icon(Icons.fact_check),
-              label: 'Approvals',
+            NavigationDestination(
+              icon: const Icon(Icons.fact_check_outlined),
+              selectedIcon: const Icon(Icons.fact_check),
+              label: l10n.approvals,
             ),
-          const NavigationDestination(
-            icon: Icon(Icons.receipt_long_outlined),
-            selectedIcon: Icon(Icons.receipt_long),
-            label: 'Expenses',
+          NavigationDestination(
+            icon: const Icon(Icons.receipt_long_outlined),
+            selectedIcon: const Icon(Icons.receipt_long),
+            label: l10n.expenses,
           ),
-          const NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profile',
+          NavigationDestination(
+            icon: const Icon(Icons.person_outline),
+            selectedIcon: const Icon(Icons.person),
+            label: l10n.profile,
           ),
         ],
       ),

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../core/l10n/app_localizations_extensions.dart';
+import '../../core/l10n/locale_controller.dart';
 import '../../data/models/user.dart';
 import '../../data/services/api_service.dart';
+import '../../l10n/app_localizations.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -35,11 +39,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
+    final l10n = AppLocalizations.of(context)!;
     final initials =
         _user!.name.isNotEmpty ? _user!.name[0].toUpperCase() : '?';
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(title: Text(l10n.profile)),
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
@@ -82,7 +87,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Text(
-                _user!.role.toUpperCase(),
+                l10n.roleName(_user!.role).toUpperCase(),
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -93,6 +98,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 48),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(l10n.language),
+            trailing: DropdownButton<String>(
+              value: LocaleController.instance.languageCode,
+              items: [
+                DropdownMenuItem(value: 'en', child: Text(l10n.english)),
+                DropdownMenuItem(value: 'ar', child: Text(l10n.arabic)),
+              ],
+              onChanged: (value) async {
+                if (value != null) {
+                  final messenger = ScaffoldMessenger.of(context);
+                  try {
+                    await LocaleController.instance.setLanguageCode(value);
+                  } catch (error) {
+                    debugPrint('Failed to save language preference: $error');
+                    if (mounted) {
+                      messenger.showSnackBar(
+                        SnackBar(content: Text(l10n.failedToSaveLanguage)),
+                      );
+                    }
+                  }
+                }
+              },
+            ),
+          ),
+          const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: _logout,
             style: ElevatedButton.styleFrom(
@@ -100,7 +132,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               foregroundColor: Colors.red,
             ),
             icon: const Icon(Icons.logout),
-            label: const Text('Logout'),
+            label: Text(l10n.logout),
           ),
         ],
       ),

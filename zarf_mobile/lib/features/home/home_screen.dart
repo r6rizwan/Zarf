@@ -3,10 +3,12 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../core/l10n/app_localizations_extensions.dart';
 import '../../data/models/expense.dart';
 import '../../data/models/user.dart';
 import '../../data/repositories/expense_repo.dart';
 import '../../data/services/api_service.dart';
+import '../../l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -67,9 +69,9 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content:
-                  Text('Failed to load data. Please check your connection.')),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.failedToLoadData),
+          ),
         );
       }
     } finally {
@@ -144,6 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildStatusBadge(String status) {
+    final l10n = AppLocalizations.of(context)!;
     Color color;
     switch (status.toLowerCase()) {
       case 'approved':
@@ -164,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.circular(100),
       ),
       child: Text(
-        status.toUpperCase(),
+        l10n.statusName(status).toUpperCase(),
         style: const TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.bold,
@@ -188,14 +191,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (_loading) {
       return _buildHomeSkeleton();
     }
 
     final isManager = _user?.role == 'manager' || _user?.role == 'admin';
-    final firstName = _user?.name.split(' ').first ?? 'User';
+    final firstName = _user?.name.split(' ').first ?? l10n.user;
     final formattedDate =
-        '${DateTime.now().day} ${_monthName(DateTime.now().month)} ${DateTime.now().year}';
+        DateFormat.yMMMMd(l10n.localeName).format(DateTime.now());
 
     return Scaffold(
       body: Stack(
@@ -223,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Good morning, $firstName',
+                  l10n.goodMorning(firstName),
                   style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -268,8 +272,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('My Expenses This Month',
-                                    style: TextStyle(
+                                Text(l10n.myExpensesThisMonth,
+                                    style: const TextStyle(
                                         color: AppTheme.textSecondary,
                                         fontWeight: FontWeight.w600,
                                         fontSize: 14)),
@@ -281,13 +285,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                       fontSize: 32,
                                       fontWeight: FontWeight.bold),
                                 ),
-                                const Text('Total count',
-                                    style: TextStyle(
+                                Text(l10n.totalCount,
+                                    style: const TextStyle(
                                         color: AppTheme.textSecondary,
                                         fontSize: 12)),
                                 const SizedBox(height: 12),
-                                const Text('Tap to view details',
-                                    style: TextStyle(
+                                Text(l10n.tapToViewDetails,
+                                    style: const TextStyle(
                                         color: AppTheme.textSecondary,
                                         fontSize: 12)),
                               ],
@@ -316,8 +320,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Pending Approvals',
-                                      style: TextStyle(
+                                  Text(l10n.pendingApprovals,
+                                      style: const TextStyle(
                                           color: AppTheme.textSecondary,
                                           fontWeight: FontWeight.w600,
                                           fontSize: 14)),
@@ -329,13 +333,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                         fontSize: 32,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  const Text('Awaiting review',
-                                      style: TextStyle(
+                                  Text(l10n.awaitingReview,
+                                      style: const TextStyle(
                                           color: AppTheme.textSecondary,
                                           fontSize: 12)),
                                   const SizedBox(height: 12),
-                                  const Text('Tap to review',
-                                      style: TextStyle(
+                                  Text(l10n.tapToReview,
+                                      style: const TextStyle(
                                           color: AppTheme.textSecondary,
                                           fontSize: 12)),
                                 ],
@@ -356,9 +360,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'RECENT EXPENSES',
-                        style: TextStyle(
+                      Text(
+                        l10n.recentExpenses,
+                        style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                             color: AppTheme.textSecondary,
@@ -366,8 +370,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       GestureDetector(
                         onTap: () => context.go('/my-expenses'),
-                        child: const Text('View All',
-                            style: TextStyle(
+                        child: Text(l10n.viewAll,
+                            style: const TextStyle(
                                 color: AppTheme.primaryTeal,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14)),
@@ -380,9 +384,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 // List
                 Expanded(
                   child: _recent.isEmpty
-                      ? const Center(
-                          child: Text('No recent expenses.',
-                              style: TextStyle(color: AppTheme.textSecondary)))
+                      ? Center(
+                          child: Text(l10n.noRecentExpenses,
+                              style: const TextStyle(
+                                  color: AppTheme.textSecondary)))
                       : ListView.separated(
                           padding: const EdgeInsets.only(
                               left: 20, right: 20, bottom: 24),
@@ -400,10 +405,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(12),
-                                  border: const Border(
+                                  border: const BorderDirectional(
                                     top:
                                         BorderSide(color: AppTheme.borderColor),
-                                    right:
+                                    end:
                                         BorderSide(color: AppTheme.borderColor),
                                     bottom:
                                         BorderSide(color: AppTheme.borderColor),
@@ -427,9 +432,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                         decoration: BoxDecoration(
                                           color:
                                               _getStatusColor(expense.status),
-                                          borderRadius: const BorderRadius.only(
-                                              topLeft: Radius.circular(12),
-                                              bottomLeft: Radius.circular(12)),
+                                          borderRadius:
+                                              const BorderRadiusDirectional
+                                                  .only(
+                                                  topStart: Radius.circular(12),
+                                                  bottomStart:
+                                                      Radius.circular(12)),
                                         ),
                                       ),
                                       Expanded(
@@ -442,7 +450,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     MainAxisAlignment
                                                         .spaceBetween,
                                                 children: [
-                                                  Text(expense.category,
+                                                  Text(
+                                                      l10n.categoryName(
+                                                          expense.category),
                                                       style: const TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
@@ -450,7 +460,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           color: AppTheme
                                                               .textPrimary)),
                                                   Text(
-                                                    '${expense.currency} ${NumberFormat('#,##0.00').format(expense.amount)}',
+                                                    '${expense.currency} ${NumberFormat('#,##0.00', l10n.localeName).format(expense.amount)}',
                                                     style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
@@ -471,10 +481,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   _buildStatusBadge(
                                                       expense.status),
                                                   Text(
-                                                    expense.date
-                                                        .toIso8601String()
-                                                        .split('T')
-                                                        .first,
+                                                    l10n.formatDate(
+                                                        expense.date),
                                                     style: const TextStyle(
                                                         color: AppTheme
                                                             .textSecondary,
@@ -512,22 +520,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-}
-
-String _monthName(int month) {
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec'
-  ];
-  return months[month - 1];
 }

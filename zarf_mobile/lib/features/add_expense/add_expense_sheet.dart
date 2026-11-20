@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart' show NumberFormat;
 
 import '../../core/constants/categories.dart';
 import '../../core/constants/currencies.dart';
 import '../../core/constants/payment_methods.dart';
+import '../../core/l10n/app_localizations_extensions.dart';
 import '../../data/models/expense.dart';
 import '../../data/repositories/expense_repo.dart';
 import '../../data/services/receipt_ai_service.dart';
+import '../../l10n/app_localizations.dart';
 
 class AddExpenseSheet extends StatefulWidget {
   const AddExpenseSheet({super.key});
@@ -48,13 +51,14 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
         vatAmount: _vatAmount,
         paymentMethod: _paymentMethod,
         date: _date,
-        vendorTrn: _vendorTrn.text.trim().isNotEmpty ? _vendorTrn.text.trim() : null,
+        vendorTrn:
+            _vendorTrn.text.trim().isNotEmpty ? _vendorTrn.text.trim() : null,
       );
       await _repo.createExpense(dto);
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
       if (mounted) {
-        String msg = 'Failed to save expense.';
+        String msg = AppLocalizations.of(context)!.failedToSaveExpense;
         if (e.toString().contains('blocked by corporate policy')) {
           msg = e.toString().replaceAll('Exception: ', '');
         }
@@ -97,7 +101,9 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
       if (mounted) {
         setState(() => _vatApplicable = false); // Revert switch if failed
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to fetch VAT info.')),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.failedToFetchVat),
+          ),
         );
       }
     }
@@ -197,12 +203,13 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final amountVal = num.tryParse(_amount.text) ?? 0;
     final canSubmit = amountVal > 0 && !_loading;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Expense'),
+        title: Text(l10n.addExpense),
         centerTitle: true,
       ),
       body: Padding(
@@ -215,7 +222,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
               child: OutlinedButton.icon(
                 onPressed: _scanReceipt,
                 icon: const Icon(Icons.camera_alt_outlined),
-                label: const Text('Scan Receipt'),
+                label: Text(l10n.scanReceipt),
               ),
             ),
             if (_aiCurrency || _aiDate || _aiNotes || _aiTrn)
@@ -225,10 +232,10 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    if (_aiCurrency) _buildAiTag('Currency auto-filled'),
-                    if (_aiDate) _buildAiTag('Date auto-filled'),
-                    if (_aiNotes) _buildAiTag('Merchant auto-filled'),
-                    if (_aiTrn) _buildAiTag('Vendor TRN auto-filled'),
+                    if (_aiCurrency) _buildAiTag(l10n.currencyAutoFilled),
+                    if (_aiDate) _buildAiTag(l10n.dateAutoFilled),
+                    if (_aiNotes) _buildAiTag(l10n.merchantAutoFilled),
+                    if (_aiTrn) _buildAiTag(l10n.vendorTrnAutoFilled),
                   ],
                 ),
               ),
@@ -236,6 +243,7 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
             TextField(
               controller: _amount,
               keyboardType: TextInputType.number,
+              textDirection: TextDirection.ltr,
               textAlign: TextAlign.center,
               style: const TextStyle(
                   fontSize: 32,
@@ -259,8 +267,8 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
             const SizedBox(height: 16),
             const Divider(color: Color(0xFFE2E8F0)),
             const SizedBox(height: 24),
-            const Text('DETAILS',
-                style: TextStyle(
+            Text(l10n.details,
+                style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF64748B),
@@ -268,16 +276,17 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               initialValue: _category,
-              decoration: _decor('Category'),
+              decoration: _decor(l10n.category),
               items: expenseCategories
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .map((e) => DropdownMenuItem(
+                      value: e, child: Text(l10n.categoryName(e))))
                   .toList(),
               onChanged: (v) => setState(() => _category = v!),
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               initialValue: _currency,
-              decoration: _decor('Currency', aiFilled: _aiCurrency),
+              decoration: _decor(l10n.currency, aiFilled: _aiCurrency),
               items: expenseCurrencies
                   .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                   .toList(),
@@ -286,24 +295,25 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
             const SizedBox(height: 16),
             TextField(
               controller: _notes,
-              decoration: _decor('Notes', aiFilled: _aiNotes),
+              decoration: _decor(l10n.notesField, aiFilled: _aiNotes),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _vendorTrn,
-              decoration: _decor('Vendor TRN (Optional)', aiFilled: _aiTrn),
+              textDirection: TextDirection.ltr,
+              decoration: _decor(l10n.vendorTrnOptional, aiFilled: _aiTrn),
             ),
             const SizedBox(height: 16),
             InkWell(
               onTap: _pickDate,
               child: InputDecorator(
-                decoration: _decor('Date', aiFilled: _aiDate),
-                child: Text(_date.toIso8601String().split('T').first),
+                decoration: _decor(l10n.date, aiFilled: _aiDate),
+                child: Text(l10n.formatDate(_date)),
               ),
             ),
             const SizedBox(height: 32),
-            const Text('PAYMENT',
-                style: TextStyle(
+            Text(l10n.payment,
+                style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF64748B),
@@ -311,9 +321,10 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               initialValue: _paymentMethod,
-              decoration: _decor('Payment Method'),
+              decoration: _decor(l10n.paymentMethod),
               items: paymentMethods
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .map((e) => DropdownMenuItem(
+                      value: e, child: Text(l10n.paymentMethodName(e))))
                   .toList(),
               onChanged: (v) => setState(() => _paymentMethod = v!),
             ),
@@ -321,8 +332,8 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('VAT (5%)',
-                    style: TextStyle(
+                Text(l10n.vatRate('5'),
+                    style: const TextStyle(
                         fontWeight: FontWeight.w600, color: Color(0xFF0F172A))),
                 Switch(
                   value: _vatApplicable,
@@ -333,7 +344,9 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
               ],
             ),
             if (_vatApplicable)
-              Text('VAT: $_currency ${_vatAmount.toStringAsFixed(2)}',
+              Text(
+                  l10n.vatValue(
+                      '$_currency ${NumberFormat('#,##0.00', l10n.localeName).format(_vatAmount)}'),
                   style: const TextStyle(
                       color: Color(0xFF0D9488),
                       fontSize: 12,
@@ -358,8 +371,8 @@ class _AddExpenseSheetState extends State<AddExpenseSheet> {
                         width: 20,
                         child: CircularProgressIndicator(
                             color: Colors.white, strokeWidth: 2))
-                    : const Text('Submit Expense',
-                        style: TextStyle(
+                    : Text(l10n.submitExpense,
+                        style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ),

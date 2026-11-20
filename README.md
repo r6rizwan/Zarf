@@ -32,10 +32,12 @@
 - **Free-Tier Performance Optimizations:** Health-check keep-alive pinging, compressed API responses, lean Mongo reads, trimmed expense-list payloads, and in-memory mobile caching to reduce Render cold-start pain.
 - **Premium UX Polish:** Smooth soft-keyboard dismissals via active focus releases on login and submission sheets.
 - **Manager Queues:** Real-time review lanes to Approve or Reject transactions with custom comments.
+- **Arabic & English Mobile Localization:** Switch languages from the Flutter mobile profile; Arabic automatically enables RTL layout and localized dates and numbers.
 - **Push Notifications:** Instant FCM push alerts delivered to employee devices when a manager approves or rejects their expense claim.
 - **VAT-Aware Architecture:** Fully configurable VAT rates (UAE 5%, Saudi 15%, etc.) with live AED currency conversion.
 
 [Explore the full Product Roadmap & Completed Milestones here!](ROADMAP.md)
+[See the release notes](CHANGELOG.md).
 
 ## Role & Platform Separation
 Zarf is structured with a strict, multi-tenant B2B separation of concerns across platforms:
@@ -186,7 +188,8 @@ Recruiters and reviewers can use the following pre-seeded test accounts to explo
 ## Notes
 - VAT rate is company-configurable — not hardcoded anywhere
 - All Flutter layouts use DirectionalityAware alignment
-- Arabic RTL localization is in the roadmap
+- Arabic/English localization currently covers the Flutter mobile app; web dashboard localization and bilingual exports remain planned
+- Offline-first synchronization is in the roadmap
 - Mobile expense lists auto-refresh (polling + app resume + return from detail)
 - Nested stateful navigation (StatefulShellRoute tab caching) preventing redundant API re-fetching and preserving UI scroll positions
 - Mobile networking uses in-memory auth token caching, short-lived list caching, and GET retry/backoff for unstable connections

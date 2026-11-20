@@ -10,6 +10,7 @@ Zarf Mobile dynamically shifts its UI components and layouts depending on the lo
 
 *   **📱 Standard Employees:**
     *   **3-Tab Layout:** Dashboard (Home), Expense History, and Profile.
+    *   **English & Arabic Localization:** Choose a language from Profile; the preference is saved, Arabic enables RTL layout, and dates and numbers follow the selected locale.
     *   **AI OCR Scanning:** Take photos of receipts to auto-fill amount, currency, merchant, dates, and vendor TRN instantly via Groq API (Llama 4 Scout).
     *   **TRN & Policy Awareness:** Captures vendor TRN, validates 15-digit GCC formats (UAE/Saudi), and notifies employees if a submission violates company spending policies.
     *   **VAT & Multi-Currency:** Dynamic UAE (5%) / GCC VAT toggles, live AED conversion rates, and clean numeric formatting (e.g., `AED 1,000.00`).
@@ -23,6 +24,7 @@ Zarf Mobile dynamically shifts its UI components and layouts depending on the lo
 
 *   **Core:** Flutter (Material 3 standard)
 *   **Routing & State Navigation:** `GoRouter` + `StatefulShellRoute.indexedStack` (Tab-caching nested navigation that prevents redundant page rebuilds and maintains scroll states).
+*   **Localization:** English and Arabic ARB resources in `lib/l10n/`; regenerate localization code with `flutter gen-l10n`.
 *   **State Management:** Riverpod (`flutter_riverpod`) ready.
 *   **HTTP client:** `Dio` (fully equipped with JWT attachments and automatic 401 token refresh interceptors).
 *   **Storage:** Secure local storage (`flutter_secure_storage`).
@@ -34,6 +36,7 @@ Zarf Mobile dynamically shifts its UI components and layouts depending on the lo
 ```text
 lib/
 ├── core/
+│   ├── l10n/        # Locale preference and localized data formatting
 │   ├── router/      # GoRouter navigation & StatefulShellRoute configurations
 │   └── theme/       # Premium Teal-600 color system & Material 3 tokens
 ├── data/

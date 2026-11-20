@@ -5,8 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../core/l10n/app_localizations_extensions.dart';
 import '../../data/models/expense.dart';
 import '../../data/repositories/expense_repo.dart';
+import '../../l10n/app_localizations.dart';
 
 class MyExpensesScreen extends StatefulWidget {
   const MyExpensesScreen({super.key});
@@ -27,13 +29,6 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
   String _status = '';
   String _sortBy = 'date';
   bool _sortAsc = false;
-
-  static const Map<String, String> _sortOptions = {
-    'date': 'Date',
-    'amount': 'Amount',
-    'status': 'Status',
-    'category': 'Category',
-  };
 
   @override
   void initState() {
@@ -74,9 +69,9 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text(
-                  'Failed to load expenses. Please check your connection.')),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.failedToLoadExpenses),
+          ),
         );
       }
     } finally {
@@ -102,6 +97,7 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
   }
 
   Widget _buildStatusBadge(String status) {
+    final l10n = AppLocalizations.of(context)!;
     Color color;
     switch (status.toLowerCase()) {
       case 'approved':
@@ -122,7 +118,7 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
         borderRadius: BorderRadius.circular(100),
       ),
       child: Text(
-        status.toUpperCase(),
+        l10n.statusName(status).toUpperCase(),
         style: const TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.bold,
@@ -146,8 +142,15 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final sortOptions = {
+      'date': l10n.date,
+      'amount': l10n.amount,
+      'status': l10n.status,
+      'category': l10n.category,
+    };
     return Scaffold(
-      appBar: AppBar(title: const Text('My Expenses')),
+      appBar: AppBar(title: Text(l10n.myExpenses)),
       body: RefreshIndicator(
         onRefresh: () => _load(reset: true),
         child: Column(
@@ -165,7 +168,7 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
                     'rejected'
                   ])
                     Padding(
-                      padding: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsetsDirectional.only(end: 8),
                       child: GestureDetector(
                         onTap: () {
                           setState(() => _status = item);
@@ -185,9 +188,7 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
                                     : AppTheme.borderColor),
                           ),
                           child: Text(
-                            item.isEmpty
-                                ? 'All'
-                                : item[0].toUpperCase() + item.substring(1),
+                            item.isEmpty ? l10n.all : l10n.statusName(item),
                             style: TextStyle(
                               color: _status == item
                                   ? Colors.white
@@ -206,14 +207,14 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
-                  const Text('Sort by:',
-                      style: TextStyle(
+                  Text(l10n.sortBy,
+                      style: const TextStyle(
                           color: AppTheme.textSecondary,
                           fontWeight: FontWeight.w600)),
                   const SizedBox(width: 12),
                   DropdownButton<String>(
                     value: _sortBy,
-                    items: _sortOptions.entries
+                    items: sortOptions.entries
                         .map((entry) => DropdownMenuItem(
                               value: entry.key,
                               child: Text(entry.value),
@@ -241,7 +242,7 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
                         setState(() => _status = '');
                         _load(reset: true);
                       },
-                      child: const Text('Clear filter'),
+                      child: Text(l10n.clearFilter),
                     ),
                 ],
               ),
@@ -261,8 +262,8 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
                               const SizedBox(height: 16),
                               Text(
                                 _status.isEmpty
-                                    ? 'No expenses yet'
-                                    : 'No expenses match this filter',
+                                    ? l10n.noExpensesYet
+                                    : l10n.noExpensesMatchFilter,
                                 style: const TextStyle(
                                     color: AppTheme.textSecondary,
                                     fontSize: 16),
@@ -293,10 +294,10 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(12),
-                                  border: const Border(
+                                  border: const BorderDirectional(
                                     top:
                                         BorderSide(color: AppTheme.borderColor),
-                                    right:
+                                    end:
                                         BorderSide(color: AppTheme.borderColor),
                                     bottom:
                                         BorderSide(color: AppTheme.borderColor),
@@ -320,9 +321,12 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
                                         decoration: BoxDecoration(
                                           color:
                                               _getStatusColor(expense.status),
-                                          borderRadius: const BorderRadius.only(
-                                              topLeft: Radius.circular(12),
-                                              bottomLeft: Radius.circular(12)),
+                                          borderRadius:
+                                              const BorderRadiusDirectional
+                                                  .only(
+                                                  topStart: Radius.circular(12),
+                                                  bottomStart:
+                                                      Radius.circular(12)),
                                         ),
                                       ),
                                       Expanded(
@@ -335,7 +339,9 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
                                                     MainAxisAlignment
                                                         .spaceBetween,
                                                 children: [
-                                                  Text(expense.category,
+                                                  Text(
+                                                      l10n.categoryName(
+                                                          expense.category),
                                                       style: const TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
@@ -343,7 +349,7 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
                                                           color: AppTheme
                                                               .textPrimary)),
                                                   Text(
-                                                    '${expense.currency} ${NumberFormat('#,##0.00').format(expense.amount)}',
+                                                    '${expense.currency} ${NumberFormat('#,##0.00', l10n.localeName).format(expense.amount)}',
                                                     style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
@@ -364,10 +370,8 @@ class _MyExpensesScreenState extends State<MyExpensesScreen>
                                                   _buildStatusBadge(
                                                       expense.status),
                                                   Text(
-                                                    expense.date
-                                                        .toIso8601String()
-                                                        .split('T')
-                                                        .first,
+                                                    l10n.formatDate(
+                                                        expense.date),
                                                     style: const TextStyle(
                                                         color: AppTheme
                                                             .textSecondary,

@@ -5,8 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../core/l10n/app_localizations_extensions.dart';
 import '../../data/models/expense.dart';
 import '../../data/repositories/expense_repo.dart';
+import '../../l10n/app_localizations.dart';
 
 class ApprovalQueueScreen extends StatefulWidget {
   const ApprovalQueueScreen({super.key});
@@ -37,14 +39,16 @@ class _ApprovalQueueScreenState extends State<ApprovalQueueScreen>
     if (!mounted) return;
     setState(() => _loading = true);
     try {
-      final res =
-          await _repo.getExpenses(status: 'pending', page: 1, limit: 10, useCache: false);
+      final res = await _repo.getExpenses(
+          status: 'pending', page: 1, limit: 10, useCache: false);
       if (!mounted) return;
       setState(() => _items = (res['data'] as List<Expense>));
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to load pending approvals.')),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.failedToLoadApprovals),
+          ),
         );
       }
     } finally {
@@ -70,11 +74,12 @@ class _ApprovalQueueScreenState extends State<ApprovalQueueScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
-            const Text('Pending Approvals'),
+            Text(l10n.pendingApprovals),
             if (_items.isNotEmpty) ...[
               const SizedBox(width: 8),
               Container(
@@ -120,8 +125,8 @@ class _ApprovalQueueScreenState extends State<ApprovalQueueScreen>
                                   color: AppTheme.primaryTeal
                                       .withValues(alpha: 0.3)),
                               const SizedBox(height: 16),
-                              const Text('All caught up!',
-                                  style: TextStyle(
+                              Text(l10n.allCaughtUp,
+                                  style: const TextStyle(
                                       color: AppTheme.textSecondary,
                                       fontSize: 16)),
                               const SizedBox(height: 16),
@@ -131,7 +136,7 @@ class _ApprovalQueueScreenState extends State<ApprovalQueueScreen>
                                   backgroundColor: AppTheme.primaryTeal,
                                   foregroundColor: Colors.white,
                                 ),
-                                child: const Text('Refresh'),
+                                child: Text(l10n.refresh),
                               ),
                             ],
                           ),
@@ -165,13 +170,13 @@ class _ApprovalQueueScreenState extends State<ApprovalQueueScreen>
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(e.userName ?? 'Employee',
+                                Text(e.userName ?? l10n.employee,
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
                                         color: AppTheme.textPrimary)),
                                 Text(
-                                    '${e.currency} ${NumberFormat('#,##0.00').format(e.amount)}',
+                                    '${e.currency} ${NumberFormat('#,##0.00', l10n.localeName).format(e.amount)}',
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
@@ -191,13 +196,13 @@ class _ApprovalQueueScreenState extends State<ApprovalQueueScreen>
                                         Border.all(color: AppTheme.borderColor),
                                     borderRadius: BorderRadius.circular(100),
                                   ),
-                                  child: Text(e.category,
+                                  child: Text(l10n.categoryName(e.category),
                                       style: const TextStyle(
                                           fontSize: 10,
                                           color: AppTheme.textSecondary,
                                           fontWeight: FontWeight.bold)),
                                 ),
-                                Text(e.date.toIso8601String().split('T').first,
+                                Text(l10n.formatDate(e.date),
                                     style: const TextStyle(
                                         color: AppTheme.textSecondary,
                                         fontSize: 12)),
@@ -206,7 +211,7 @@ class _ApprovalQueueScreenState extends State<ApprovalQueueScreen>
                             const SizedBox(height: 8),
                             // Bottom row
                             Align(
-                              alignment: Alignment.centerRight,
+                              alignment: AlignmentDirectional.centerEnd,
                               child: TextButton(
                                 onPressed: () async {
                                   await context.push('/expense/${e.id}');
@@ -220,9 +225,9 @@ class _ApprovalQueueScreenState extends State<ApprovalQueueScreen>
                                   tapTargetSize:
                                       MaterialTapTargetSize.shrinkWrap,
                                 ),
-                                child: const Text('Review',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
+                                child: Text(l10n.review,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold)),
                               ),
                             ),
                           ],

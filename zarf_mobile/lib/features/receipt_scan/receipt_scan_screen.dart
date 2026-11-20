@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../data/services/receipt_ai_service.dart';
+import '../../l10n/app_localizations.dart';
 
 class ReceiptScanScreen extends StatefulWidget {
   const ReceiptScanScreen({super.key});
@@ -37,8 +38,7 @@ class _ReceiptScanScreenState extends State<ReceiptScanScreen> {
       if (!mounted) return;
       setState(() {
         _loading = false;
-        _errorMessage =
-            'Could not parse receipt. Try a clearer photo or a different image.';
+        _errorMessage = AppLocalizations.of(context)!.couldNotParseReceipt;
       });
 
       if (e is DioException) {
@@ -54,7 +54,7 @@ class _ReceiptScanScreenState extends State<ReceiptScanScreen> {
           backgroundColor: Colors.redAccent,
           duration: const Duration(seconds: 12),
           action: SnackBarAction(
-            label: 'Dismiss',
+            label: AppLocalizations.of(context)!.dismiss,
             textColor: Colors.white,
             onPressed: () {},
           ),
@@ -65,8 +65,9 @@ class _ReceiptScanScreenState extends State<ReceiptScanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Scan Receipt')),
+      appBar: AppBar(title: Text(l10n.scanReceiptTitle)),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
         child: Column(
@@ -79,10 +80,10 @@ class _ReceiptScanScreenState extends State<ReceiptScanScreen> {
               color: Colors.teal,
             ),
             const SizedBox(height: 24),
-            const Text(
-              'AI Receipt Scanner',
+            Text(
+              l10n.aiReceiptScanner,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
@@ -90,7 +91,7 @@ class _ReceiptScanScreenState extends State<ReceiptScanScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Snap a photo of your receipt or upload an image from your gallery to auto-fill expense details instantly.',
+              l10n.receiptScannerDescription,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
@@ -130,7 +131,7 @@ class _ReceiptScanScreenState extends State<ReceiptScanScreen> {
                     ),
                     const SizedBox(height: 12),
                     Align(
-                      alignment: Alignment.centerRight,
+                      alignment: AlignmentDirectional.centerEnd,
                       child: OutlinedButton(
                         onPressed: _loading
                             ? null
@@ -139,21 +140,21 @@ class _ReceiptScanScreenState extends State<ReceiptScanScreen> {
                           foregroundColor: Colors.redAccent,
                           side: const BorderSide(color: Colors.redAccent),
                         ),
-                        child: const Text('Retry Scan'),
+                        child: Text(l10n.retryScan),
                       ),
                     ),
                   ],
                 ),
               ),
             if (_loading)
-              const Center(
+              Center(
                 child: Column(
                   children: [
-                    CircularProgressIndicator(color: Colors.teal),
-                    SizedBox(height: 16),
+                    const CircularProgressIndicator(color: Colors.teal),
+                    const SizedBox(height: 16),
                     Text(
-                      'AI is parsing your receipt...',
-                      style: TextStyle(
+                      l10n.aiParsingReceipt,
+                      style: const TextStyle(
                         color: Colors.teal,
                         fontWeight: FontWeight.bold,
                       ),
@@ -165,7 +166,7 @@ class _ReceiptScanScreenState extends State<ReceiptScanScreen> {
               ElevatedButton.icon(
                 onPressed: _loading ? null : () => _capture(ImageSource.camera),
                 icon: const Icon(Icons.camera_alt_rounded),
-                label: const Text('Take a Photo'),
+                label: Text(l10n.takePhoto),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.teal,
                   foregroundColor: Colors.white,
@@ -180,7 +181,7 @@ class _ReceiptScanScreenState extends State<ReceiptScanScreen> {
                 onPressed:
                     _loading ? null : () => _capture(ImageSource.gallery),
                 icon: const Icon(Icons.photo_library_rounded),
-                label: const Text('Upload from Gallery'),
+                label: Text(l10n.uploadFromGallery),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.teal,
                   side: const BorderSide(color: Colors.teal, width: 1.5),
@@ -195,7 +196,7 @@ class _ReceiptScanScreenState extends State<ReceiptScanScreen> {
             TextButton(
               onPressed: _loading ? null : () => Navigator.of(context).pop(),
               child: Text(
-                'Skip & Enter Manually',
+                l10n.skipEnterManually,
                 style: TextStyle(
                   color: Colors.grey[600],
                   fontSize: 14,

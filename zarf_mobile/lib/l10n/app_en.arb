@@ -1,0 +1,138 @@
+{
+  "@@locale": "en",
+  "language": "Language",
+  "english": "English",
+  "arabic": "العربية",
+  "home": "Home",
+  "approvals": "Approvals",
+  "expenses": "Expenses",
+  "profile": "Profile",
+  "updateAvailable": "Update available: v{version}",
+  "@updateAvailable": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "currentVersionUpdate": "You are on v{version}. Download the latest build from GitHub Releases.",
+  "@currentVersionUpdate": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "update": "Update",
+  "dismiss": "Dismiss",
+  "welcomeBack": "Welcome back",
+  "signInToManageExpenses": "Sign in to manage your expenses",
+  "wakingServer": "Waking up server...",
+  "serverSleepNotice": "The backend API is sleeping on Render's free tier. Spin-up may take up to 60 seconds.",
+  "emailAddress": "Email Address",
+  "password": "Password",
+  "signIn": "Sign In",
+  "loginFailed": "Login failed",
+  "failedToLoadData": "Failed to load data. Please check your connection.",
+  "goodMorning": "Good morning, {name}",
+  "@goodMorning": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "user": "User",
+  "myExpensesThisMonth": "My Expenses This Month",
+  "totalCount": "Total count",
+  "tapToViewDetails": "Tap to view details",
+  "pendingApprovals": "Pending Approvals",
+  "awaitingReview": "Awaiting review",
+  "tapToReview": "Tap to review",
+  "recentExpenses": "RECENT EXPENSES",
+  "viewAll": "View All",
+  "noRecentExpenses": "No recent expenses.",
+  "approved": "Approved",
+  "rejected": "Rejected",
+  "pending": "Pending",
+  "myExpenses": "My Expenses",
+  "all": "All",
+  "sortBy": "Sort by:",
+  "date": "Date",
+  "amount": "Amount",
+  "status": "Status",
+  "category": "Category",
+  "clearFilter": "Clear filter",
+  "noExpensesYet": "No expenses yet",
+  "noExpensesMatchFilter": "No expenses match this filter",
+  "failedToLoadExpenses": "Failed to load expenses. Please check your connection.",
+  "allCaughtUp": "All caught up!",
+  "refresh": "Refresh",
+  "employee": "Employee",
+  "review": "Review",
+  "failedToLoadApprovals": "Failed to load pending approvals.",
+  "expenseDetail": "Expense Detail",
+  "failedToLoadExpense": "Failed to load expense. Please try again.",
+  "failedToLoadExpenseDetails": "Failed to load expense details.",
+  "expenseApprovedSuccessfully": "Expense approved successfully.",
+  "expenseRejectedSuccessfully": "Expense rejected successfully.",
+  "failedToUpdateStatus": "Failed to update status.",
+  "paymentMethod": "Payment Method",
+  "notAvailable": "N/A",
+  "baseAmount": "Base Amount",
+  "vatAmount": "VAT Amount",
+  "vatIncluded": "VAT Included: {amount}",
+  "@vatIncluded": {
+    "placeholders": {
+      "amount": {"type": "String"}
+    }
+  },
+  "notes": "NOTES",
+  "notesField": "Notes",
+  "viewReceipt": "View Receipt",
+  "addCommentOptional": "Add a comment (optional)",
+  "reject": "Reject",
+  "approve": "Approve",
+  "addExpense": "Add Expense",
+  "scanReceipt": "Scan Receipt",
+  "currencyAutoFilled": "Currency auto-filled",
+  "dateAutoFilled": "Date auto-filled",
+  "merchantAutoFilled": "Merchant auto-filled",
+  "vendorTrnAutoFilled": "Vendor TRN auto-filled",
+  "details": "DETAILS",
+  "currency": "Currency",
+  "vendorTrnOptional": "Vendor TRN (Optional)",
+  "payment": "PAYMENT",
+  "vatRate": "VAT ({rate}%)",
+  "@vatRate": {
+    "placeholders": {
+      "rate": {"type": "String"}
+    }
+  },
+  "vatValue": "VAT: {amount}",
+  "@vatValue": {
+    "placeholders": {
+      "amount": {"type": "String"}
+    }
+  },
+  "submitExpense": "Submit Expense",
+  "failedToSaveExpense": "Failed to save expense.",
+  "failedToFetchVat": "Failed to fetch VAT info.",
+  "scanReceiptTitle": "Scan Receipt",
+  "aiReceiptScanner": "AI Receipt Scanner",
+  "receiptScannerDescription": "Snap a photo of your receipt or upload an image from your gallery to auto-fill expense details instantly.",
+  "couldNotParseReceipt": "Could not parse receipt. Try a clearer photo or a different image.",
+  "retryScan": "Retry Scan",
+  "aiParsingReceipt": "AI is parsing your receipt...",
+  "takePhoto": "Take a Photo",
+  "uploadFromGallery": "Upload from Gallery",
+  "skipEnterManually": "Skip & Enter Manually",
+  "logout": "Logout",
+  "failedToSaveLanguage": "Could not save your language preference.",
+  "roleAdmin": "Admin",
+  "roleManager": "Manager",
+  "roleEmployee": "Employee",
+  "travel": "Travel",
+  "meals": "Meals",
+  "accommodation": "Accommodation",
+  "officeSupplies": "Office Supplies",
+  "clientEntertainment": "Client Entertainment",
+  "other": "Other",
+  "cash": "Cash",
+  "card": "Card",
+  "bankTransfer": "Bank Transfer"
+}

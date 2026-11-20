@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../data/repositories/auth_repo.dart';
 import '../../data/services/api_service.dart';
+import '../../l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -58,7 +59,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _submit() async {
-    FocusScope.of(context).unfocus(); // Dismiss soft keyboard and clear active focus
+    FocusScope.of(context)
+        .unfocus(); // Dismiss soft keyboard and clear active focus
     setState(() {
       _loading = true;
       _error = null;
@@ -73,7 +75,8 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } on DioException catch (e) {
       setState(() {
-        _error = e.response?.data?['message']?.toString() ?? 'Login failed';
+        _error = e.response?.data?['message']?.toString() ??
+            AppLocalizations.of(context)!.loginFailed;
       });
     } finally {
       if (mounted) {
@@ -86,6 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -113,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 32),
               Text(
-                'Welcome back',
+                l10n.welcomeBack,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -121,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Sign in to manage your expenses',
+                l10n.signInToManageExpenses,
                 style: Theme.of(context).textTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),
@@ -141,7 +145,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 16,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue.shade600),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.blue.shade600),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -150,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Waking up server...',
+                              l10n.wakingServer,
                               style: TextStyle(
                                 color: Colors.blue.shade900,
                                 fontWeight: FontWeight.bold,
@@ -159,7 +164,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'The backend API is sleeping on Render\'s free tier. Spin-up may take up to 60 seconds.',
+                              l10n.serverSleepNotice,
                               style: TextStyle(
                                 color: Colors.blue.shade700,
                                 fontSize: 11,
@@ -176,18 +181,20 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 controller: _email,
                 keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Email Address',
-                  prefixIcon: Icon(Icons.email_outlined),
+                textDirection: TextDirection.ltr,
+                decoration: InputDecoration(
+                  labelText: l10n.emailAddress,
+                  prefixIcon: const Icon(Icons.email_outlined),
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _password,
                 obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  prefixIcon: Icon(Icons.lock_outline),
+                textDirection: TextDirection.ltr,
+                decoration: InputDecoration(
+                  labelText: l10n.password,
+                  prefixIcon: const Icon(Icons.lock_outline),
                 ),
               ),
               const SizedBox(height: 24),
@@ -216,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: Colors.white),
                       )
-                    : const Text('Sign In'),
+                    : Text(l10n.signIn),
               ),
             ],
           ),

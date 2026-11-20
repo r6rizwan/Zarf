@@ -1,10 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
+import '../../core/l10n/app_localizations_extensions.dart';
 import '../../data/models/expense.dart';
 import '../../data/models/user.dart';
 import '../../data/repositories/expense_repo.dart';
 import '../../data/services/api_service.dart';
+import '../../l10n/app_localizations.dart';
 
 class ExpenseDetailScreen extends StatefulWidget {
   final String id;
@@ -38,7 +41,10 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
       if (mounted) {
         setState(() => _hasError = true);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to load expense details.')),
+          SnackBar(
+            content:
+                Text(AppLocalizations.of(context)!.failedToLoadExpenseDetails),
+          ),
         );
       }
     }
@@ -61,8 +67,12 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Expense ${status == 'approved' ? 'approved' : 'rejected'} successfully'),
-            backgroundColor: status == 'approved' ? const Color(0xFF22C55E) : const Color(0xFFEF4444),
+            content: Text(status == 'approved'
+                ? AppLocalizations.of(context)!.expenseApprovedSuccessfully
+                : AppLocalizations.of(context)!.expenseRejectedSuccessfully),
+            backgroundColor: status == 'approved'
+                ? const Color(0xFF22C55E)
+                : const Color(0xFFEF4444),
           ),
         );
       }
@@ -70,7 +80,9 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to update status.')),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.failedToUpdateStatus),
+          ),
         );
       }
     }
@@ -93,7 +105,7 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
             child: Text(value,
                 style: const TextStyle(
                     fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
-                textAlign: TextAlign.right),
+                textAlign: TextAlign.end),
           ),
         ],
       ),
@@ -101,6 +113,7 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
   }
 
   Widget _buildStatusBadge(String status) {
+    final l10n = AppLocalizations.of(context)!;
     Color color;
     switch (status.toLowerCase()) {
       case 'approved':
@@ -118,7 +131,7 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration:
           BoxDecoration(color: color, borderRadius: BorderRadius.circular(100)),
-      child: Text(status.toUpperCase(),
+      child: Text(l10n.statusName(status).toUpperCase(),
           style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
@@ -145,9 +158,9 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
                     const Icon(Icons.error, color: Colors.white, size: 48),
               ),
             ),
-            Positioned(
+            PositionedDirectional(
               top: 40,
-              right: 20,
+              end: 20,
               child: IconButton(
                 icon: const Icon(Icons.close, color: Colors.white, size: 32),
                 onPressed: () => Navigator.of(context).pop(),
@@ -161,12 +174,12 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final e = expense;
     if (_hasError) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Expense Detail')),
-        body: const Center(
-            child: Text('Failed to load expense. Please try again.')),
+        appBar: AppBar(title: Text(l10n.expenseDetail)),
+        body: Center(child: Text(l10n.failedToLoadExpense)),
       );
     }
     if (e == null) {
@@ -177,7 +190,7 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
         e.status == 'pending';
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Expense Detail')),
+      appBar: AppBar(title: Text(l10n.expenseDetail)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -202,14 +215,14 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
                   _buildStatusBadge(e.status),
                   const SizedBox(height: 16),
                   Text(
-                    '${e.currency} ${e.amount.toStringAsFixed(2)}',
+                    '${e.currency} ${NumberFormat('#,##0.00', l10n.localeName).format(e.amount)}',
                     style: const TextStyle(
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF0D9488)),
                   ),
                   const SizedBox(height: 4),
-                  Text(e.category,
+                  Text(l10n.categoryName(e.category),
                       style: const TextStyle(
                           fontSize: 16, color: Color(0xFF64748B))),
                 ],
@@ -227,24 +240,27 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               child: Column(
                 children: [
-                  _buildDetailRow('Category', e.category),
-                  const Divider(color: Color(0xFFE2E8F0), height: 1),
-                  _buildDetailRow('Payment Method', e.paymentMethod ?? 'N/A'),
+                  _buildDetailRow(l10n.category, l10n.categoryName(e.category)),
                   const Divider(color: Color(0xFFE2E8F0), height: 1),
                   _buildDetailRow(
-                      'Date', e.date.toIso8601String().split('T').first),
+                      l10n.paymentMethod,
+                      e.paymentMethod == null
+                          ? l10n.notAvailable
+                          : l10n.paymentMethodName(e.paymentMethod!)),
+                  const Divider(color: Color(0xFFE2E8F0), height: 1),
+                  _buildDetailRow(l10n.date, l10n.formatDate(e.date)),
                   const Divider(color: Color(0xFFE2E8F0), height: 1),
                   _buildDetailRow(
-                      'Base Amount',
+                      l10n.baseAmount,
                       e.amountBase != null
-                          ? '${e.currency} ${e.amountBase!.toStringAsFixed(2)}'
-                          : 'N/A'),
+                          ? '${e.currency} ${NumberFormat('#,##0.00', l10n.localeName).format(e.amountBase!)}'
+                          : l10n.notAvailable),
                   const Divider(color: Color(0xFFE2E8F0), height: 1),
                   _buildDetailRow(
-                      'VAT Amount',
+                      l10n.vatAmount,
                       e.vatApplicable
-                          ? '${e.currency} ${e.vatAmount.toStringAsFixed(2)}'
-                          : 'N/A'),
+                          ? '${e.currency} ${NumberFormat('#,##0.00', l10n.localeName).format(e.vatAmount)}'
+                          : l10n.notAvailable),
                 ],
               ),
             ),
@@ -263,7 +279,8 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'VAT Included: ${e.currency} ${e.vatAmount.toStringAsFixed(2)}',
+                        l10n.vatIncluded(
+                            '${e.currency} ${NumberFormat('#,##0.00', l10n.localeName).format(e.vatAmount)}'),
                         style: const TextStyle(
                             color: Color(0xFF0D9488),
                             fontWeight: FontWeight.w600),
@@ -275,8 +292,8 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
 
             if (e.notes != null && e.notes!.isNotEmpty) ...[
               const SizedBox(height: 24),
-              const Text('NOTES',
-                  style: TextStyle(
+              Text(l10n.notes,
+                  style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF64748B),
@@ -302,7 +319,7 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
                 height: 52,
                 child: OutlinedButton(
                   onPressed: () => _viewReceipt(e.receiptUrl!),
-                  child: const Text('View Receipt'),
+                  child: Text(l10n.viewReceipt),
                 ),
               ),
             ],
@@ -329,10 +346,10 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
                   children: [
                     TextField(
                       controller: _commentController,
-                      decoration: const InputDecoration(
-                        labelText: 'Add a comment (optional)',
+                      decoration: InputDecoration(
+                        labelText: l10n.addCommentOptional,
                         filled: true,
-                        fillColor: Color(0xFFF8FAFC),
+                        fillColor: const Color(0xFFF8FAFC),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -348,7 +365,7 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
                                 side: const BorderSide(
                                     color: Color(0xFFEF4444), width: 1.5),
                               ),
-                              child: const Text('Reject'),
+                              child: Text(l10n.reject),
                             ),
                           ),
                         ),
@@ -362,7 +379,7 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
                                 backgroundColor: const Color(0xFF0D9488),
                                 foregroundColor: Colors.white,
                               ),
-                              child: const Text('Approve'),
+                              child: Text(l10n.approve),
                             ),
                           ),
                         ),

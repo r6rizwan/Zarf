@@ -21,8 +21,8 @@ gantt
     section Phase 3 - GCC Integrations
     TRN Tax Entity Validation         :done, p7, 2026-06, 2026-07
     Automated Corporate Policies      :done, p8, 2026-07, 2026-08
-    section Phase 4 - Future Horizon
-    Arabic RTL Localization           : p9, 2026-09, 2026-10
+    section Phase 4 - Localization and Offline Architecture
+    Mobile Arabic RTL Localization     :done, p9, 2026-09, 2026-11
     Offline-First Synchronization     : p10, 2026-10, 2026-12
 ```
 
@@ -54,7 +54,8 @@ gantt
 
 ---
 
-## 🌍 Phase 4: Localization & Offline Architecture (Future Horizon)
-*   **Arabic RTL Localization:** Implement a comprehensive RTL localization engine using Flutter's native `Directionality` widgets, supporting dual Arabic-English corporate reporting.
+## 🌍 Phase 4: Localization & Offline Architecture (In Progress)
+*   **Arabic RTL Mobile Localization (Completed 2026-11):** Added persistent Arabic/English language selection, translated Flutter mobile workflows, native RTL layout direction, and locale-aware dates and number formatting.
+*   **Web Dashboard Localization:** Extend Arabic/English translations and RTL layout support to the React manager/admin dashboard.
 *   **Offline-First Draft Queue:** Enable employees to capture receipts and log expenses in remote areas with zero internet coverage, automatically queuing the payloads to sync when connectivity resumes.
-*   **PDF/Excel Reporting Engine:** Add web-based multi-currency report exports with corporate branding for tax filing and annual auditing.
+*   **PDF/Excel Reporting Engine:** Add web-based multi-currency report exports with corporate branding and Arabic/English output for tax filing and annual auditing.
